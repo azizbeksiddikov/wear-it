@@ -32,3 +32,26 @@ export interface OrderUpdate {
   orderShippingCost?: number;
   orderTotalAmount?: number;
 }
+
+export interface OrderItem {
+  _id: ObjectId;
+  orderId: ObjectId;
+  productId: ObjectId;
+  variantId: ObjectId;
+  itemQuantity: number;
+  itemUnitPrice: number;
+  size: string;
+  color: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface OrderItemInput {
+  orderId: ObjectId;
+  productId: ObjectId;
+  variantId: ObjectId;
+  itemQuantity: number;
+  itemUnitPrice: number;
+  size: string;
+  color: string;
+}
