@@ -22,6 +22,15 @@ const productVariantSchema = new Schema(
       type: Number,
       required: true,
     },
+
+    productPrice: {
+      type: Number,
+      required: true,
+    },
+
+    salesPrice: {
+      type: Number,
+    },
   },
   { timestamps: true }
 );

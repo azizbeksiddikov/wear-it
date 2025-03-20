@@ -12,6 +12,7 @@ if (!MONGO_URL) {
 }
 
 mongoose.set("strictQuery", false);
+mongoose.Schema.Types.String.set("trim", true);
 
 (async function startServer() {
   try {

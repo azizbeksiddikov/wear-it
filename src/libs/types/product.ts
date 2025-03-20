@@ -6,6 +6,8 @@ export interface ProductVariant {
   size: string;
   color: string;
   stockQuantity: number;
+  productPrice: number;
+  salesPrice?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -15,6 +17,8 @@ export interface ProductVariantInput {
   size: string;
   color: string;
   stockQuantity: number;
+  productPrice: number;
+  salesPrice?: number;
 }
 
 export interface ProductVariantUpdate {
@@ -22,4 +26,19 @@ export interface ProductVariantUpdate {
   size?: string;
   color?: string;
   stockQuantity?: number;
+  productPrice?: number;
+  salesPrice?: number;
+}
+
+export interface Product {
+  _id: ObjectId;
+  productName: string;
+  productDesc?: string;
+  onSale?: boolean;
+  categoryId: ObjectId;
+  isFeatured?: boolean;
+  isActive: boolean;
+
+  createdAt: Date;
+  updatedAt: Date;
 }
