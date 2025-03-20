@@ -16,12 +16,12 @@ export interface Order {
 
 export interface OrderInput {
   memberId: ObjectId;
-  orderDate: Date;
-  orderStatus: OrderStatus;
+  orderDate?: Date;
+  orderStatus?: OrderStatus;
   orderShippingAddress: string;
   orderSubTotal: number;
   orderShippingCost: number;
-  orderTotalAmount: number;
+  orderTotalAmount?: number;
 }
 
 export interface OrderUpdate {
