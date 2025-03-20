@@ -1,5 +1,9 @@
 import mongoose, { Schema } from "mongoose";
-import { productType } from "../libs/enums/product.enum";
+import {
+  productCategory,
+  productGender,
+  productStatus,
+} from "../libs/enums/product.enum";
 
 const productSchema = new Schema(
   {
@@ -13,16 +17,22 @@ const productSchema = new Schema(
       type: String,
     },
 
+    gender: {
+      type: String,
+      required: true,
+      enum: productGender,
+    },
+
     categoryId: {
-      type: Schema.Types.ObjectId,
-      ref: "Category",
+      type: String,
+      enum: productCategory,
       required: true,
     },
 
     productType: {
       type: String,
-      enum: productType,
-      default: productType.ACTIVE,
+      enum: productStatus,
+      default: productStatus.ACTIVE,
     },
 
     productImages: {
