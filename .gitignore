@@ -6,8 +6,6 @@ src/controllers/
 src/models/
 src/public/
 src/views/
-src/router.ts
-src/router-admin.ts
 
 
 
