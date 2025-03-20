@@ -4,13 +4,16 @@ uploads/
 input_images/
 src/controllers/
 src/models/
-src/libs/
 src/public/
 src/views/
 src/schema/
 src/router.ts
 src/router-admin.ts
-src/app.ts
+
+src/libs/enums
+src/libs/types
+
+
 .DS_Store
 
 # files
