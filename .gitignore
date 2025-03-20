@@ -10,8 +10,6 @@ src/schema/
 src/router.ts
 src/router-admin.ts
 
-src/libs/enums
-src/libs/types
 
 
 .DS_Store
