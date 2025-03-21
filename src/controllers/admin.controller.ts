@@ -160,9 +160,20 @@ adminController.getUsers = async (req: AdminRequest, res: Response) => {
     res.redirect("/admin");
   }
 };
+
 adminController.getChosenUser = async (req: AdminRequest, res: Response) => {
-  console.log("getChosenUser");
-  res.redirect("/admin");
+  try {
+    console.log("getChosenUser");
+
+    const id = req.params.id;
+    const result = await memberService.getChosenUser(id);
+
+    res.status(HttpCode.OK).json({ data: result });
+  } catch (err) {
+    console.log("Error, getChosenUser:", err);
+    if (err instanceof Errors) res.status(err.code).json(err);
+    else res.status(Errors.standard.code).json(Errors.standard);
+  }
 };
 
 adminController.updateChosenUser = async (req: AdminRequest, res: Response) => {

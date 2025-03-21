@@ -151,6 +151,17 @@ class MemberService {
 
     return result as unknown as Member;
   }
+
+  public async getChosenUser(inputId: string): Promise<Member> {
+    inputId = shapeIntoMongooseObjectId(inputId);
+    const result = await this.memberModel.findById({ _id: inputId }).exec();
+
+    // TODO: get Member Orders info
+
+    if (!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
+
+    return result as unknown as Member;
+  }
 }
 
 export default MemberService;
