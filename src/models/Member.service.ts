@@ -1,4 +1,4 @@
-import { MemberType } from "../libs/enums/member.enum";
+import { MemberStatus, MemberType } from "../libs/enums/member.enum";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import {
   LoginInput,
@@ -17,6 +17,47 @@ class MemberService {
   }
 
   /** USER **/
+  public async signup(input: MemberInput): Promise<Member> {
+    const salt = await bcryptjs.genSalt();
+    input.memberPassword = await bcryptjs.hash(input.memberPassword, salt);
+    input.memberType = MemberType.USER;
+
+    try {
+      const result = await this.memberModel.create(input);
+
+      result.memberPassword = "";
+      return result.toJSON() as unknown as Member;
+    } catch (err) {
+      console.log("Error, model:signup", err);
+      throw new Errors(HttpCode.BAD_REQUEST, Message.USED_EMAIL_PHONE);
+    }
+  }
+
+  public async login(input: LoginInput): Promise<Member> {
+    const member = await this.memberModel
+      .findOne(
+        {
+          memberEmail: input.memberEmail,
+          memberStatus: { $ne: MemberStatus.DELETE },
+        },
+        { memberNick: 1, memberPassword: 1, memberStatus: 1 }
+      )
+      .exec();
+    if (!member) throw new Errors(HttpCode.NOT_FOUND, Message.NO_MEMBER_EMAIL);
+    else if (member.memberStatus === MemberStatus.BLOCK)
+      throw new Errors(HttpCode.FORBIDDEN, Message.BLOCKED_USER);
+
+    const isMatch = await bcryptjs.compare(
+      input.memberPassword,
+      member.memberPassword
+    );
+
+    if (!isMatch)
+      throw new Errors(HttpCode.UNAUTHORIZED, Message.WRONG_PASSWORD);
+
+    const result = await this.memberModel.findById(member._id).lean().exec();
+    return result as unknown as Member;
+  }
 
   /** ADMIN **/
   public async processSignup(input: MemberInput): Promise<Member> {

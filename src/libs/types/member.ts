@@ -29,7 +29,6 @@ export interface MemberInput {
   memberAddress?: string;
   memberDesc?: string;
   memberImage?: string;
-  memberPoints?: number;
 }
 
 export interface MemberUpdateInput {
@@ -48,6 +47,7 @@ export interface LoginInput {
   memberEmail: string;
   memberPassword: string;
 }
+
 export interface MemberInquiry {
   page: number;
   limit: number;
@@ -61,6 +61,6 @@ export interface AdminRequest extends Request {
   files: Express.Multer.File[];
 }
 
-export interface ExtendedRequest extends Request {
-  member: Member;
+export interface MemberRequest extends Request {
+  member?: Member;
 }

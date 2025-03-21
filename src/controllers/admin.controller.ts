@@ -142,7 +142,6 @@ adminController.verifyAdmin = async (
 };
 
 /** Member Management **/
-// get an array of users with pagination of 10 users per page
 adminController.getUsers = async (req: AdminRequest, res: Response) => {
   try {
     console.log("getUsers");
