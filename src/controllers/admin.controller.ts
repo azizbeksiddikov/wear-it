@@ -1,7 +1,12 @@
 import { T } from "../libs/types/common";
 import e, { NextFunction, Request, Response } from "express";
 import MemberService from "../models/Member.service";
-import { AdminRequest, LoginInput, MemberInput } from "../libs/types/member";
+import {
+  AdminRequest,
+  LoginInput,
+  MemberInput,
+  MemberInquiry,
+} from "../libs/types/member";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import { MemberType } from "../libs/enums/member.enum";
 
@@ -137,9 +142,24 @@ adminController.verifyAdmin = async (
 };
 
 /** Member Management **/
+// get an array of users with pagination of 10 users per page
 adminController.getUsers = async (req: AdminRequest, res: Response) => {
-  console.log("getUsers");
-  res.redirect("/admin");
+  try {
+    console.log("getUsers");
+
+    const { page = 1, limit = 10, text } = req.query;
+    const input: MemberInquiry = {
+      page: Number(page),
+      limit: Number(limit),
+      text: text ? String(text) : undefined,
+    };
+
+    const result = await memberService.getUsers(input);
+    res.render("users", { result });
+  } catch (err) {
+    console.error("Error, getUsers:", err);
+    res.redirect("/admin");
+  }
 };
 adminController.getChosenUser = async (req: AdminRequest, res: Response) => {
   console.log("getChosenUser");

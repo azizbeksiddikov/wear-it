@@ -48,6 +48,11 @@ export interface LoginInput {
   memberEmail: string;
   memberPassword: string;
 }
+export interface MemberInquiry {
+  page: number;
+  limit: number;
+  text?: string;
+}
 
 export interface AdminRequest extends Request {
   member: Member;
