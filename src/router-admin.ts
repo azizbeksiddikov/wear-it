@@ -2,6 +2,7 @@ import express from "express";
 import router from "./router";
 import adminController from "./controllers/admin.controller";
 import productController from "./controllers/product.controller";
+import makeUploader from "./libs/utils/uploader";
 
 const routerAdmin = express.Router();
 
@@ -11,7 +12,12 @@ routerAdmin.get("/", adminController.verifyAdmin, adminController.goHome);
 /** Admin Auth **/
 routerAdmin
   .get("/signup", adminController.getSignup)
-  .post("/signup", adminController.processSignup); // makeUploader("members").single("memberImage"),
+  .post(
+    "/signup",
+    makeUploader("members").single("memberImage"),
+    adminController.processSignup
+  );
+
 routerAdmin
   .get("/login", adminController.getLogin)
   .post("/login", adminController.processLogin);
