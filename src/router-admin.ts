@@ -1,51 +1,65 @@
 import express from "express";
 import router from "./router";
+import adminController from "./controllers/admin.controller";
+import productController from "./controllers/product.controller";
+
 const routerAdmin = express.Router();
 
-/** Admin Management **/
-routerAdmin.post("/signup", (req, res) => {});
-routerAdmin.post("/login", (req, res) => {});
-routerAdmin.post("/logout", (req, res) => {});
-routerAdmin.get("/profile", (req, res) => {});
-routerAdmin.post("/profile", (req, res) => {});
+/** Home **/
+routerAdmin.get("/", adminController.verifyAdmin, adminController.goHome);
+
+/** Admin Auth **/
+routerAdmin
+  .get("/signup", adminController.getSignup)
+  .post("/signup", adminController.processSignup); // makeUploader("members").single("memberImage"),
+routerAdmin
+  .get("/login", adminController.getLogin)
+  .post("/login", adminController.processLogin);
+routerAdmin.get("/logout", adminController.logout);
+routerAdmin.get("/check-me", adminController.checkAuthSession);
 
 /** Member Management **/
-routerAdmin.get("/users", (req, res) => {});
-routerAdmin.get("/users/:id", (req, res) => {});
-routerAdmin.post("/users/:id", (req, res) => {});
+routerAdmin.get(
+  "/user/all",
+  adminController.verifyAdmin,
+  adminController.getUsers
+);
+
+routerAdmin.get(
+  "/user/:id",
+  adminController.verifyAdmin,
+  adminController.getChosenUser
+); // + orders
+
+routerAdmin.post(
+  "/user/:id",
+  adminController.verifyAdmin,
+  adminController.updateChosenUser
+);
 
 /** Product Management **/
-// getProducts
-routerAdmin.get("/products", (req, res) => {});
-// getProduct
-routerAdmin.get("/products/:id", (req, res) => {});
-// createProduct
-routerAdmin.post("/products", (req, res) => {});
-// updateProduct
-routerAdmin.post("/products/:id", (req, res) => {});
+routerAdmin.get(
+  "/product/all",
+  adminController.verifyAdmin,
+  productController.getAllProducts
+);
 
-/** Product Variant Management **/
-// createVariant
-routerAdmin.post("/products/:id/variants", (req, res) => {});
-// getVariants
-routerAdmin.get("/products/:id/variants", (req, res) => {});
-// updateVariant
-routerAdmin.post("/variants/:id", (req, res) => {});
+routerAdmin.post(
+  "/product/create",
+  adminController.verifyAdmin,
+  productController.createNewProduct
+); //   makeUploader("products").array("productImages", 5)
 
-/** Orders **/
-// getLatestOrders
-routerAdmin.get("/orders", (req, res) => {});
-// getOrder
-routerAdmin.get("/orders/:id", (req, res) => {});
-// updateOrder
-routerAdmin.post("/orders/:id", (req, res) => {});
+routerAdmin.get(
+  "/product/:id",
+  adminController.verifyAdmin,
+  productController.getChosenProduct // + reviews
+);
 
-/** Review **/
-routerAdmin.get("/reviews", (req, res) => {});
-routerAdmin.get("/reviews/:id", (req, res) => {});
-routerAdmin.post("/reviews/:id", (req, res) => {});
-
-/** Dashboard **/
-routerAdmin.get("/", (req, res) => {});
+routerAdmin.post(
+  "/product/:id",
+  adminController.verifyAdmin,
+  productController.updateChosenProduct
+);
 
 export default routerAdmin;
