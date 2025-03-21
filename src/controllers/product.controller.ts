@@ -6,7 +6,7 @@ const productController: T = {};
 
 // SPA
 productController.getProducts = async () => {};
-productController.getProduct = async () => {};
+productController.getProduct = async () => {}; // + reviews
 
 // SSR
 productController.getAllProducts = async (req: AdminRequest, res: Response) => {
@@ -20,7 +20,7 @@ productController.createNewProduct = async (
 productController.getChosenProduct = async (
   req: AdminRequest,
   res: Response
-) => {};
+) => {}; // + reviews
 productController.updateChosenProduct = async (
   req: AdminRequest,
   res: Response

@@ -1,27 +1,49 @@
 import express from "express";
+import memberController from "./controllers/member.controller";
+import productController from "./controllers/product.controller";
+import orderController from "./controllers/order.controller";
+import reviewController from "./controllers/review.controller";
 const router = express.Router();
 
-/** Member Managment  **/
-router.get("/member/admin", (req, res) => {}); // Admin info
-router.post("/signup", (req, res) => {}); // User signup
-router.post("/login", (req, res) => {}); // User login
-router.post("/logout", (req, res) => {}); // User logout
-router.get("member/detail", (req, res) => {}); // User detail
-router.post("/member/update", (req, res) => {}); // User update
+/** Member **/
+router.get("/member/admin", memberController.getAdmin);
+router.post("/member/signup", memberController.signup);
+router.post("/member/login", memberController.login);
+router.post("/logout", memberController.verifyAuth, memberController.logout);
+router.get("member/detail", memberController.getMemberDetail);
+router.post(
+  "/member/update",
+  memberController.verifyAuth,
+  memberController.updateMember
+); //   uploader("members").single("memberImage"),
 
 /** Product **/
-router.get("/product/all", (req, res) => {}); // Get all products
-router.get("/product/:id", (req, res) => {}); // Get product by id
+router.get("/product/all", productController.getProducts);
+router.get(
+  "/product/:id",
+  memberController.retrieveAuth,
+  productController.getProduct
+);
 
 /** Orders **/
-router.post("/order/create", (req, res) => {}); // Create order
-router.get("/order/all", (req, res) => {}); // Get all orders
-router.post("/order/update", (req, res) => {}); // Update order
+router.post(
+  "/order/create",
+  memberController.verifyAuth,
+  orderController.createOrder
+);
+router.get(
+  "/order/all",
+  memberController.verifyAuth,
+  orderController.getMyOrders
+);
+router.post(
+  "/order/update/",
+  memberController.verifyAuth,
+  orderController.updateOrder
+);
 
 /** Review **/
-router.get("/review/all", (req, res) => {}); // Get all reviews
-router.get("/review/:id", (req, res) => {}); // Get review by id
-router.post("/review/create", (req, res) => {}); // Create review
-router.post("/review/update", (req, res) => {}); // Update review
+router.post("/review/create", reviewController.createReview);
+router.post("/review/update", reviewController.updateReview);
 
 export default router;
