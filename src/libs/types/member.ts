@@ -29,6 +29,7 @@ export interface MemberInput {
   memberAddress?: string;
   memberDesc?: string;
   memberImage?: string;
+  memberPoints?: number;
 }
 
 export interface MemberUpdateInput {
@@ -62,5 +63,5 @@ export interface AdminRequest extends Request {
 }
 
 export interface MemberRequest extends Request {
-  member?: Member;
+  member: Member;
 }

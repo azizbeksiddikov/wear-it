@@ -75,7 +75,7 @@ memberController.logout = async (req: MemberRequest, res: Response) => {
   }
 };
 
-memberController.verifyAuth = (
+memberController.verifyAuth = async (
   req: MemberRequest,
   res: Response,
   next: NextFunction
@@ -86,7 +86,7 @@ memberController.verifyAuth = (
     const token = req.cookies?.accessToken;
 
     if (token) {
-      req.member = authService.verifyToken(token) as unknown as Member;
+      req.member = (await authService.verifyToken(token)) as unknown as Member;
     }
 
     if (!req.member)
@@ -120,8 +120,25 @@ memberController.retrieveAuth = async (
 };
 
 /** Member **/
-memberController.getAdmin = () => {};
-memberController.getMemberDetail = () => {};
-memberController.updateMember = () => {};
+memberController.getAdmin = async () => {};
+memberController.getMemberDetail = async () => {};
+
+memberController.getMemberDetail = async (
+  req: MemberRequest,
+  res: Response
+) => {
+  try {
+    console.log("getMemberDetail");
+    const result = await memberService.getMemberDetail(req.member);
+
+    res.status(HttpCode.OK).json(result);
+  } catch (err) {
+    console.log("Error, getMemberDetail", err);
+    if (err instanceof Errors) res.status(err.code).json(err);
+    else res.status(Errors.standard.code).json(Errors.standard);
+  }
+};
+
+memberController.updateMember = async () => {};
 
 export default memberController;

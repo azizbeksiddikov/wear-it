@@ -1,3 +1,4 @@
+import { shapeIntoMongooseObjectId } from "../libs/config";
 import { MemberStatus, MemberType } from "../libs/enums/member.enum";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import {
@@ -5,6 +6,7 @@ import {
   Member,
   MemberInput,
   MemberInquiry,
+  MemberUpdateInput,
 } from "../libs/types/member";
 import MemberModel from "../schema/Member.model";
 import * as bcryptjs from "bcryptjs";
@@ -21,6 +23,7 @@ class MemberService {
     const salt = await bcryptjs.genSalt();
     input.memberPassword = await bcryptjs.hash(input.memberPassword, salt);
     input.memberType = MemberType.USER;
+    input.memberPoints = 100;
 
     try {
       const result = await this.memberModel.create(input);
@@ -56,6 +59,18 @@ class MemberService {
       throw new Errors(HttpCode.UNAUTHORIZED, Message.WRONG_PASSWORD);
 
     const result = await this.memberModel.findById(member._id).lean().exec();
+    return result as unknown as Member;
+  }
+
+  public async getMemberDetail(member: Member): Promise<Member> {
+    const memberId = shapeIntoMongooseObjectId(member._id);
+    const result = await this.memberModel
+      .findOne({ _id: memberId, memberStatus: MemberStatus.ACTIVE })
+      .exec();
+
+    // TODO: get Member Orders info
+
+    if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
     return result as unknown as Member;
   }
 
@@ -108,8 +123,6 @@ class MemberService {
     const filter: any = { memberType: MemberType.USER };
     if (text) filter.memberEmail = { $regex: text, $options: "i" };
 
-    console.log(filter);
-
     const result = await this.memberModel
       .find(filter)
       .skip(skip)
@@ -119,6 +132,24 @@ class MemberService {
     if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
 
     return result as unknown as Member[];
+  }
+
+  public async updateChosenUser(
+    inputId: string,
+    input: MemberUpdateInput
+  ): Promise<Member> {
+    input._id = shapeIntoMongooseObjectId(inputId);
+    const result = await this.memberModel
+      .findByIdAndUpdate({ _id: input._id }, input, {
+        new: true,
+        runValidators: true,
+        lean: true,
+      })
+      .exec();
+
+    if (!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
+
+    return result as unknown as Member;
   }
 }
 
