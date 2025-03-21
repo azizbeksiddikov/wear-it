@@ -1,7 +1,7 @@
 import { T } from "../libs/types/common";
 import e, { NextFunction, Request, Response } from "express";
 import MemberService from "../models/Member.service";
-import { AdminRequest, MemberInput } from "../libs/types/member";
+import { AdminRequest, LoginInput, MemberInput } from "../libs/types/member";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import { MemberType } from "../libs/enums/member.enum";
 
@@ -51,17 +51,71 @@ adminController.processSignup = async (req: AdminRequest, res: Response) => {
   }
 };
 
-adminController.getLogin = async (req: Request, res: Response) => {};
-adminController.processLogin = async (req: AdminRequest, res: Response) => {};
+adminController.getLogin = async (req: Request, res: Response) => {
+  try {
+    console.log("getLogin");
+    res.render("login");
+  } catch (err) {
+    console.error("Error, getLogin:", err);
+    res.redirect("/admin");
+  }
+};
+adminController.processLogin = async (req: AdminRequest, res: Response) => {
+  try {
+    console.log("processLogin");
+
+    const input: LoginInput = req.body;
+    const member = await memberService.processLogin(input);
+
+    req.session.member = member;
+
+    req.session.save(function () {
+      res.redirect("/admin/product/all");
+    });
+  } catch (err) {
+    const message =
+      err instanceof Errors ? err.message : Message.SOMETHING_WENT_WRONG;
+    console.error("Error, processLogin:", message);
+    res.send(
+      `<script> alert("${message}"); window.location.replace("/admin/login")</script>`
+    );
+  }
+};
 
 adminController.logout = async (req: AdminRequest, res: Response) => {
-  console.log("logout");
-  res.redirect("/admin");
+  try {
+    console.log("logout");
+
+    req.session.destroy(function (err) {
+      res.redirect("/admin/login");
+    });
+  } catch (err) {
+    const message =
+      err instanceof Errors ? err.message : Message.SOMETHING_WENT_WRONG;
+    console.error("Error, logout:", message);
+    res.send(
+      `<script> alert("${message}"); window.location.replace("/admin/login")</script>`
+    );
+  }
 };
 
 adminController.checkAuthSession = async (req: AdminRequest, res: Response) => {
-  console.log("checkAuthSession");
-  res.redirect("/admin");
+  try {
+    console.log("checkAuthSession");
+
+    if (req.session?.member)
+      res.send(
+        `<script> alert("Hi, your email is ${req.session.member.memberEmail}")</script>`
+      );
+    else res.send(`<script> alert("${Message.NOT_AUTHENTICATED}")</script>`);
+  } catch (err) {
+    const message =
+      err instanceof Errors ? err.message : Message.SOMETHING_WENT_WRONG;
+    console.error("Error, checkAuthSession:", message);
+    res.send(
+      `<script> alert("${message}"); window.location.replace("/admin/login")</script>`
+    );
+  }
 };
 
 adminController.verifyAdmin = async (
@@ -70,7 +124,16 @@ adminController.verifyAdmin = async (
   next: NextFunction
 ) => {
   console.log("verifyAdmin");
-  next();
+
+  if (req.session?.member?.memberType === MemberType.ADMIN) {
+    req.member = req.session.member;
+    next();
+  } else {
+    const message = Message.NOT_AUTHENTICATED;
+    res.send(
+      `<script> alert("${message}");window.location.replace("/admin/login")</script>`
+    );
+  }
 };
 
 /** Member Management **/
