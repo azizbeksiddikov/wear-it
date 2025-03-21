@@ -19,9 +19,6 @@ const memberController: T = {},
   authService = new AuthService();
 
 /** Auth **/
-memberController.login = () => {};
-memberController.logout = () => {};
-
 memberController.signup = async (req: Request, res: Response) => {
   try {
     console.log("signup");
