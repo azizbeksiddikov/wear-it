@@ -1,13 +1,4 @@
 $(document).ready(function () {
-  // Navbar scroll effect
-  $(window).scroll(function () {
-    if ($(this).scrollTop() > 50) {
-      $(".navbar").addClass("scrolled");
-    } else {
-      $(".navbar").removeClass("scrolled");
-    }
-  });
-
   // Set active link based on current page
   const currentPath = window.location.pathname;
   $(".nav-link").each(function () {

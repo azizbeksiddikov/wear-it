@@ -6,48 +6,44 @@
 <body>
   <%- include('includes/navbar') %>
 
-  <div class="container">
-    <div class="row justify-content-center align-items-center min-vh-100">
-      <div class="col-12 col-md-6 col-lg-4">
-        <div class="card login-card shadow">
-          <div class="card-body p-5">
-            <h2 class="text-center mb-4">Login</h2>
-            <form action="/admin/login" method="POST">
-              <div class="mb-3">
-                <label for="memberEmail" class="form-label"
-                  >Email address</label
-                >
-                <input
-                  type="email"
-                  class="form-control"
-                  id="memberEmail"
-                  name="memberEmail"
-                  placeholder="example@gmail.com"
-                  required
-                />
-              </div>
-              <div class="mb-3">
-                <label for="memberPassword" class="form-label">Password</label>
-                <input
-                  type="password"
-                  class="form-control"
-                  id="memberPassword"
-                  name="memberPassword"
-                  placeholder="Password"
-                  required
-                />
-              </div>
-              <div class="d-grid">
-                <button type="submit" class="btn btn-primary">Login</button>
-              </div>
-            </form>
-            <div class="text-center mt-3">
-              <p class="mb-0">
-                Don't have an account? <a href="/admin/signup">Sign up</a>
-              </p>
-            </div>
-          </div>
+  <div class="login">
+    <div class="login-container">
+      <h2 class="login-text">Login</h2>
+
+      <form action="/admin/login" method="POST">
+        <div class="label">
+          <label for="memberEmail" class="form-label">Email address</label>
+          <input
+            type="email"
+            class="form-control"
+            id="memberEmail"
+            name="memberEmail"
+            placeholder="example@gmail.com"
+            required
+          />
         </div>
+
+        <div class="label">
+          <label for="memberPassword" class="form-label">Password</label>
+          <input
+            type="password"
+            class="form-control"
+            id="memberPassword"
+            name="memberPassword"
+            placeholder="Password"
+            required
+          />
+        </div>
+
+        <div class="login-button">
+          <button type="submit" class="btn btn-primary">Login</button>
+        </div>
+      </form>
+
+      <div class="signup-redirect">
+        <p class="signup-text">
+          Don't have an account? <a href="/admin/signup">Sign up</a>
+        </p>
       </div>
     </div>
   </div>

@@ -1,172 +1,97 @@
-// Initialize points modal
-let pointsModal;
-
-document.addEventListener("DOMContentLoaded", function () {
-  pointsModal = new bootstrap.Modal(document.getElementById("pointsModal"));
-});
-
-// Toggle status options
-function toggleStatusOptions(element) {
-  const combobox = element.parentElement;
-  combobox.classList.toggle("active");
-
-  // Close other open comboboxes
-  document.querySelectorAll(".status-combobox.active").forEach((cb) => {
-    if (cb !== combobox) {
-      cb.classList.remove("active");
-    }
-  });
-}
-
-// Close status options when clicking outside
-document.addEventListener("click", function (event) {
-  if (!event.target.closest(".status-combobox")) {
-    document.querySelectorAll(".status-combobox.active").forEach((cb) => {
-      cb.classList.remove("active");
-    });
-  }
-});
-
 // Update user status
-async function updateStatus(userId, newStatus) {
-  try {
-    const response = await fetch(`/users/${userId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        memberStatus: newStatus,
-      }),
-    });
+$(function () {
+  $(".status-badge").on("change", function () {
+    const $badge = $(this);
+    const memberStatus = this.value;
+    const userId = this._id;
 
-    if (response.ok) {
-      const statusBadge = document.querySelector(
-        `tr[data-user-id="${userId}"] .status-badge`
-      );
-      statusBadge.className = `status-badge ${newStatus.toLowerCase()}`;
-      statusBadge.textContent = newStatus;
-      statusBadge.parentElement.classList.remove("active");
-      showNotification("Status updated successfully", "success");
-    } else {
-      throw new Error("Failed to update status");
-    }
-  } catch (error) {
-    showNotification("Failed to update status", "error");
-  }
-}
+    // Show loading state
+    $badge.addClass("loading").css("opacity", "0.7");
 
-// Open points update modal
-function openPointsPopup(userId, currentPoints) {
-  document.getElementById("userId").value = userId;
-  document.getElementById("points").value = currentPoints;
-  pointsModal.show();
-}
-
-// Update user points
-async function updatePoints() {
-  const userId = document.getElementById("userId").value;
-  const newPoints = document.getElementById("points").value;
-
-  if (isNaN(newPoints) || newPoints < 0) {
-    showNotification("Please enter a valid number", "error");
-    return;
-  }
-
-  try {
-    const response = await fetch(`/users/${userId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        memberPoints: parseInt(newPoints),
-      }),
-    });
-
-    if (response.ok) {
-      const pointsBadge = document.querySelector(
-        `tr[data-user-id="${userId}"] .points-badge`
-      );
-      pointsBadge.textContent = `${newPoints} pts`;
-      pointsModal.hide();
-      showNotification("Points updated successfully", "success");
-    } else {
-      throw new Error("Failed to update points");
-    }
-  } catch (error) {
-    showNotification("Failed to update points", "error");
-  }
-}
-
-// Search functionality
-document.getElementById("searchInput").addEventListener("keyup", function () {
-  const searchTerm = this.value.toLowerCase();
-  const rows = document.querySelectorAll(".table tbody tr");
-
-  rows.forEach((row) => {
-    const text = row.textContent.toLowerCase();
-    row.style.display = text.includes(searchTerm) ? "" : "none";
+    axios
+      .post(`/admin/users/${userId}/status`, {
+        memberStatus: memberStatus,
+      })
+      .then((response) => {
+        if (response?.data?.data) {
+          console.log("User updated successfully");
+          // Visual feedback
+          $badge.removeClass("loading").css("opacity", "");
+          showToast("Success", "User status updated successfully", "success");
+        } else {
+          console.log(err);
+          alert("User update failed");
+        }
+      })
+      .finally(() => {
+        $badge.removeClass("loading");
+      });
   });
+
+  // Handle points updates
+  let pointsTimeout;
+  $(".points-input").on("input", function () {
+    const $input = $(this);
+    const userId = $input.closest(".points-badge").attr("id");
+    const points = parseInt($input.val());
+
+    clearTimeout(pointsTimeout);
+
+    // Debounce the update
+    pointsTimeout = setTimeout(() => {
+      axios
+        .post(`/admin/users/${userId}/points`, {
+          memberPoints: points,
+        })
+        .then((response) => {
+          if (response.data.success) {
+            showToast("Success", "Points updated successfully");
+          }
+        })
+        .catch((error) => {
+          console.error("Error updating points:", error);
+          showToast("Error", "Failed to update points", "error");
+          // Revert to original value
+          $input.val(prevPoints);
+        });
+    }, 500);
+  });
+
+  // Search functionality
+  $(".search-box input").on(
+    "input",
+    debounce(function () {
+      const query = $(this).val().toLowerCase();
+      $("tbody tr").each(function () {
+        const $row = $(this);
+        const name = $row.find(".user-name").text().toLowerCase();
+        const email = $row.find(".user-email").text().toLowerCase();
+
+        if (name.includes(query) || email.includes(query)) {
+          $row.show();
+        } else {
+          $row.hide();
+        }
+      });
+    }, 300)
+  );
 });
 
-// Show notification
-function showNotification(message, type = "success") {
-  const notification = document.createElement("div");
-  notification.className = `notification ${type}`;
-  notification.textContent = message;
-
-  document.body.appendChild(notification);
-
-  // Add styles dynamically
-  notification.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 1rem 2rem;
-    border-radius: 6px;
-    color: white;
-    font-weight: 500;
-    z-index: 1000;
-    animation: slideIn 0.3s ease-out;
-  `;
-
-  if (type === "success") {
-    notification.style.backgroundColor = "#28a745";
-  } else {
-    notification.style.backgroundColor = "#dc3545";
-  }
-
-  // Remove notification after 3 seconds
-  setTimeout(() => {
-    notification.style.animation = "slideOut 0.3s ease-out";
-    setTimeout(() => notification.remove(), 300);
-  }, 3000);
+// Utility function for debouncing
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
 }
 
-// Add animation keyframes
-const style = document.createElement("style");
-style.textContent = `
-  @keyframes slideIn {
-    from {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
-
-  @keyframes slideOut {
-    from {
-      transform: translateX(0);
-      opacity: 1;
-    }
-    to {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-  }
-`;
-document.head.appendChild(style);
+// Toast notification function
+function showToast(title, message, type = "success") {
+  // Implement your toast notification logic here
+  console.log(`${title}: ${message}`);
+}
