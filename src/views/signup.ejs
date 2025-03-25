@@ -1,18 +1,42 @@
 <%- include('includes/header') %>
 
-<!-- Login CSS -->
+<!-- Signup CSS -->
 <link rel="stylesheet" href="/css/signup.css" />
+
 
 <body class="bg-light">
   <%- include('includes/navbar') %>
 
   <div class="container">
     <div class="row justify-content-center align-items-center min-vh-100">
-      <div class="col-12 col-md-6 col-lg-4">
+      <div class="col-12 col-md-6 col-lg-5">
         <div class="card shadow">
           <div class="card-body p-5">
             <h2 class="text-center mb-4">Sign Up</h2>
-            <form action="/admin/signup" method="POST">
+            <form id = "signupForm" action="/admin/signup" method="POST" enctype="multipart/form-data">
+              <div class="text-center mb-4">
+                <div class="image-upload-container">
+                  <input 
+                    type="file" 
+                    id="profileImage" 
+                    name="memberImage"
+                    accept="image/*" 
+                    class="file-input" 
+                    hidden
+                  >
+                  <label for="profileImage" class="image-preview">
+                    <img 
+                    src="/img/default-user.webp" 
+                    alt="Profile Preview" 
+                      class="preview-image" 
+                      id="imagePreview"
+                    >
+                    <div class="upload-overlay">
+                      <span class="upload-icon">+</span>
+                    </div>
+                  </label>
+                </div>
+
               <div class="mb-3">
                 <label for="memberEmail" class="form-label"
                   >Email address</label
@@ -24,21 +48,19 @@
                   name="memberEmail"
                   required
                 />
+
               </div>
-              <div class="mb-3">
+              <div class="mb-3 position-relative">
                 <label for="memberPhone" class="form-label">Phone Number</label>
                 <input
                   type="tel"
                   class="form-control"
                   id="memberPhone"
                   name="memberPhone"
-                  pattern="[0-9]{10}"
-                  placeholder="Enter 10-digit phone number"
+                  placeholder="010-0000-0000"
                   required
-                />
-                <!-- <div class="form-text">
-                  Please enter a 10-digit phone number
-                </div> -->
+                />                 
+
               </div>
               <div class="mb-3">
                 <label for="memberPassword" class="form-label">Password</label>

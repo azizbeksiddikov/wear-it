@@ -34,6 +34,7 @@ routerAdmin.get(
   adminController.verifyAdmin,
   adminController.getUsers
 );
+/* img/default-user.webp */
 
 routerAdmin.get(
   "/user/:id",
