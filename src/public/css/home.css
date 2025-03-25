@@ -1,0 +1,24 @@
+/* Background animation styling */
+#vanta-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Places it behind other content */
+}
+
+/* Main content area styling */
+.products-content {
+  position: relative;
+  z-index: 1; /* Ensures content is above the background */
+  padding: 20px;
+  color: white; /* For better visibility against the animation */
+  /* Add more styling as needed */
+}
+
+/* Style for navbar to ensure it's above the background */
+nav {
+  position: relative;
+  z-index: 2;
+}

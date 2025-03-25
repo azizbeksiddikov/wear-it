@@ -11,7 +11,7 @@ productController.getProduct = async () => {}; // + reviews
 // SSR
 productController.getAllProducts = async (req: AdminRequest, res: Response) => {
   console.log("getAllProducts");
-  res.redirect("/admin");
+  res.render("products");
 };
 productController.createNewProduct = async (
   req: AdminRequest,
