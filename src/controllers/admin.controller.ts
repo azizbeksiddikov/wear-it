@@ -32,12 +32,12 @@ adminController.getSignup = async (req: Request, res: Response) => {
 adminController.processSignup = async (req: AdminRequest, res: Response) => {
   try {
     console.log("processSignup");
-    const file = req.file;
-    if (!file)
-      throw new Errors(HttpCode.BAD_REQUEST, Message.FILE_UPLOAD_FAILED);
+    // const file = req.file;
+    // if (!file)
+    //   throw new Errors(HttpCode.BAD_REQUEST, Message.FILE_UPLOAD_FAILED);
 
     const newMember: MemberInput = req.body;
-    newMember.memberImage = file?.path.replace(/\\/g, "");
+    // newMember.memberImage = file?.path.replace(/\\/g, "");
     newMember.memberType = MemberType.ADMIN;
     const result = await memberService.processSignup(newMember);
 

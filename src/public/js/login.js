@@ -1,6 +1,6 @@
 $(document).ready(function () {
   // Form validation
-  $("form").on("submit", function (e) {
+  $("#loginForm").on("submit", function (e) {
     const email = $("#memberEmail").val();
     const password = $("#memberPassword").val();
 

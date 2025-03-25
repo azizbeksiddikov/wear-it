@@ -3,90 +3,75 @@
 <!-- Signup CSS -->
 <link rel="stylesheet" href="/css/signup.css" />
 
-
-<body class="bg-light">
+<body>
   <%- include('includes/navbar') %>
 
-  <div class="container">
-    <div class="row justify-content-center align-items-center min-vh-100">
-      <div class="col-12 col-md-6 col-lg-5">
-        <div class="card shadow">
-          <div class="card-body p-5">
-            <h2 class="text-center">Sign Up</h2>
+  <div class="signup">
+    <div class="signup-container">
+      <h2 class="signup-text">Sign Up</h2>
 
-
-            <form id = "signupForm" action="/admin/signup" method="POST" enctype="multipart/form-data">
-              <div class="text-center mb-4">
-                <div class="image-upload-container">
-                  <input 
-                    type="file" 
-                    id="profileImage" 
-                    name="memberImage"
-                    accept="image/*" 
-                    class="file-input" 
-                    hidden
-                  >
-                  <label for="profileImage" class="image-preview">
-                    <img 
-                    src="/img/default-user.webp" 
-                    alt="Profile Preview" 
-                      class="preview-image" 
-                      id="imagePreview"
-                    >
-                    <div class="upload-overlay">
-                      <span class="upload-icon">+</span>
-                    </div>
-                  </label>
-                </div>
-
-              <div class="mb-3">
-                <label for="memberEmail" class="form-label"
-                  >Email address</label
-                >
-                <input
-                  type="email"
-                  class="form-control"
-                  id="memberEmail"
-                  name="memberEmail"
-                  placeholder="example@gmail.com"
-                  required
-                />
-
-              </div>
-              <div class="mb-3 position-relative">
-                <label for="memberPhone" class="form-label">Phone Number</label>
-                <input
-                  type="tel"
-                  class="form-control"
-                  id="memberPhone"
-                  name="memberPhone"
-                  placeholder="010-1234-5678"
-                  required
-                />                 
-
-              </div>
-              <div class="mb-3">
-                <label for="memberPassword" class="form-label">Password</label>
-                <input
-                  type="password"
-                  class="form-control"
-                  id="memberPassword"
-                  name="memberPassword"
-                  placeholder="Password"
-                  required
-                />
-              </div>
-              <div class="d-grid">
-                <button type="submit" class="btn btn-primary">Sign Up</button>
-              </div>
-            </form>
-            <div class="text-center mt-3">
-              <p class="mb-0">
-                Already have an account? <a href="/admin/login">Login</a>
-              </p>
-            </div>
-          </div>
+      <form
+        id="signupForm"
+        action="/admin/signup"
+        method="POST"
+        enctype="multipart/form-data"
+      >
+        <div class="label">
+          <label for="memberEmail" class="form-label">Email address</label>
+          <input
+            type="email"
+            class="form-control"
+            id="memberEmail"
+            name="memberEmail"
+            placeholder="example@gmail.com"
+            required
+          />
         </div>
+
+        <div class="label">
+          <label for="memberPhone" class="form-label">Phone Number</label>
+          <input
+            type="tel"
+            class="form-control"
+            id="memberPhone"
+            name="memberPhone"
+            placeholder="010-1234-5678"
+            required
+          />
+        </div>
+        <div class="label">
+          <label for="memberPassword" class="form-label">Password</label>
+          <input
+            type="password"
+            class="form-control"
+            id="memberPassword"
+            name="memberPassword"
+            placeholder="Password"
+            required
+          />
+        </div>
+
+        <div class="label">
+          <label for="memberPasswordConfirm" class="form-label">Password</label>
+          <input
+            type="password"
+            class="form-control"
+            id="memberPasswordConfirm"
+            name="memberPasswordConfirm"
+            placeholder="Confirm Password"
+            required
+          />
+        </div>
+
+        <div class="signup-button">
+          <button type="submit" class="btn btn-primary">Sign Up</button>
+        </div>
+      </form>
+
+      <div class="login-redirect">
+        <p class="login-text">
+          Already have an account? <a href="/admin/login">Login</a>
+        </p>
       </div>
     </div>
   </div>

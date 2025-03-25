@@ -14,13 +14,12 @@ routerAdmin.get(
 );
 
 /** Admin Auth **/
-routerAdmin
-  .get("/signup", adminController.getSignup)
-  .post(
-    "/signup",
-    makeUploader("members").single("memberImage"),
-    adminController.processSignup
-  );
+routerAdmin.get("/signup", adminController.getSignup).post(
+  "/signup",
+
+  adminController.processSignup
+);
+//     makeUploader("members").single("memberImage"),
 
 routerAdmin
   .get("/login", adminController.getLogin)

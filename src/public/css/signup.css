@@ -1,28 +1,199 @@
-:root {
-  /* Signup-specific Color Palette */
-  --primary-color: #e74c3c;
-  --secondary-color: #f39c12;
-  --tertiary-color: #9b59b6;
-  --quaternary-color: #3498db;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  font-family: "Inter", "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
-  background: linear-gradient(
-    -45deg,
-    var(--primary-color),
-    var(--secondary-color),
-    var(--tertiary-color),
-    var(--quaternary-color)
-  );
+.signup {
+  background: linear-gradient(-45deg, #e74c3c, #f39c12, #9b59b6, #3498db);
   background-size: 400% 400%;
   animation: gradientBG 15s ease infinite;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: "Inter", "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
+}
+
+.signup .signup-container {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  margin: 2rem auto;
+  animation: fadeIn 0.6s ease-out;
+}
+
+.signup .signup-text {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #e74c3c;
+  position: relative;
+}
+
+.signup .label {
+  margin-bottom: 1.5rem;
+}
+
+.signup .form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.signup .form-control {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.signup .form-control:focus {
+  box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25);
+}
+
+.signup .signup-button {
+  width: 100%;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.signup .btn-primary {
+  width: 100%;
+  background: linear-gradient(45deg, #e74c3c, #f39c12);
+  border: none;
+  color: white;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.signup .btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 20px rgba(231, 76, 60, 0.3);
+}
+
+.signup .login-redirect {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.signup .login-text {
+  color: #333;
+}
+
+.signup .login-text a {
+  color: #e74c3c;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.signup .login-text a:hover {
+  text-decoration: underline;
+}
+
+.signup .image-upload-container {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #f0f0f0;
+  transition: all 0.3s ease;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.signup .image-upload-container:hover {
+  border-color: #e74c3c;
+}
+
+.signup .image-preview {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.signup .preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 2px solid #ddd;
+}
+
+.signup .upload-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background 0.3s ease;
+}
+
+.signup .image-upload-container:hover .upload-overlay {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.signup .upload-icon {
+  color: white;
+  font-size: 2rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.signup .image-upload-container:hover .upload-icon {
+  opacity: 1;
+}
+
+.signup .image-upload-container.has-image .upload-overlay {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.signup .image-upload-container.has-image .upload-icon {
+  opacity: 1;
+}
+
+.signup .position-relative {
+  position: relative;
+}
+
+.signup .valid-feedback {
+  position: relative;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2em;
+  color: green;
+}
+
+/* Responsive Adjustments */
+@media screen and (max-width: 768px) {
+  .signup .signup-container {
+    width: 95%;
+    margin: 1rem;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .signup {
+    animation: none;
+    background: linear-gradient(45deg, #e74c3c, #f39c12);
+  }
 }
 
 @keyframes gradientBG {
@@ -37,100 +208,6 @@ body {
   }
 }
 
-.container {
-  width: 100%;
-  max-width: 1200px;
-  padding: 0 15px;
-}
-
-.card {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-
-.card:hover {
-  transform: scale(1.02);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 7px 20px rgba(0, 0, 0, 0.1);
-}
-
-h2 {
-  color: #34495e;
-  position: relative;
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-.form-control {
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(5px);
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
-  transition: all 0.3s ease;
-}
-
-.form-control:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25);
-}
-
-.btn-primary {
-  background: linear-gradient(
-    45deg,
-    var(--primary-color),
-    var(--secondary-color)
-  );
-  border: none;
-  color: white;
-  padding: 0.75rem 1rem;
-  width: 100%;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-}
-
-.btn-primary:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 7px 20px rgba(231, 76, 60, 0.3);
-}
-
-a {
-  color: var(--primary-color);
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-a:hover {
-  color: var(--secondary-color);
-  text-decoration: underline;
-}
-
-/* Phone input specific styling */
-input[type="tel"] {
-  letter-spacing: 1px;
-  font-size: 1em;
-}
-
-/* Responsive Adjustments */
-@media screen and (max-width: 768px) {
-  .card {
-    width: 95%;
-    max-width: 400px;
-    margin: 1rem;
-  }
-
-  .card-body {
-    padding: 2rem !important;
-  }
-}
-
-/* Animation for card */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -140,104 +217,4 @@ input[type="tel"] {
     opacity: 1;
     transform: scale(1);
   }
-}
-
-.card {
-  animation: fadeIn 0.6s ease-out;
-}
-
-/* Accessibility */
-@media (prefers-reduced-motion: reduce) {
-  body {
-    animation: none;
-    background: linear-gradient(
-      45deg,
-      var(--primary-color),
-      var(--secondary-color)
-    );
-  }
-}
-
-/* Image */
-.image-upload-container {
-  position: relative;
-  width: 150px;
-  height: 150px;
-  margin: 0 auto 20px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 3px solid #f0f0f0;
-  transition: all 0.3s ease;
-  display: inline-block;
-  cursor: pointer;
-}
-
-.image-upload-container:hover {
-  border-color: #3498db;
-}
-
-.image-preview {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  position: relative;
-}
-
-.preview-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border: 2px solid #ddd;
-}
-
-.upload-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: background 0.3s ease;
-}
-
-.image-upload-container:hover .upload-overlay {
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.upload-icon {
-  color: white;
-  font-size: 2rem;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.image-upload-container:hover .upload-icon {
-  opacity: 1;
-}
-
-.image-upload-container.has-image .upload-overlay {
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.image-upload-container.has-image .upload-icon {
-  opacity: 1;
-}
-
-.position-relative {
-  position: relative;
-}
-
-.valid-feedback {
-  position: relative;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.2em;
-  color: green;
 }
