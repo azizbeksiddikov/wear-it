@@ -153,8 +153,9 @@ adminController.getUsers = async (req: AdminRequest, res: Response) => {
       text: text ? String(text) : undefined,
     };
 
-    const result = await memberService.getUsers(input);
-    res.render("users", { result });
+    const users = await memberService.getUsers(input);
+
+    res.render("users", { users });
   } catch (err) {
     console.error("Error, getUsers:", err);
     res.redirect("/admin");

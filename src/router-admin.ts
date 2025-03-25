@@ -9,7 +9,7 @@ const routerAdmin = express.Router();
 /** Home **/
 routerAdmin.get(
   "/",
-  // adminController.verifyAdmin,
+  //  adminController.verifyAdmin,
   adminController.goHome
 );
 
@@ -30,11 +30,10 @@ routerAdmin.get("/check-me", adminController.checkAuthSession);
 
 /** Member Management **/
 routerAdmin.get(
-  "/user/all",
+  "/users",
   adminController.verifyAdmin,
   adminController.getUsers
 );
-/* img/default-user.webp */
 
 routerAdmin.get(
   "/user/:id",
