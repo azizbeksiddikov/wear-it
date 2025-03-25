@@ -1,55 +1,53 @@
-console.log("Signup frontend javascript file");
+$(document).ready(function () {
+  // Form validation
+  $("form").on("submit", function (e) {
+    const email = $("#memberEmail").val();
+    const phone = $("#memberPhone").val();
+    const password = $("#memberPassword").val();
 
-$(function () {
-  const fileTarget = $(".file-box .upload-hidden");
+    if (!email || !phone || !password) {
+      e.preventDefault();
+      alert("Please fill in all fields");
+      return false;
+    }
 
-  fileTarget.on("change", function () {
-    if (window.FileReader) {
-      const uploadFile = $(this)[0].files[0],
-        fileType = uploadFile["type"],
-        validImageType = ["image/jpg", "image/jpeg", "image/png"];
+    if (!isValidEmail(email)) {
+      e.preventDefault();
+      alert("Please enter a valid email address");
+      return false;
+    }
 
-      if (!validImageType.includes(fileType)) {
-        alert("Please insert only jpeg, jpg and png!");
-      } else if (uploadFile) {
-        let filename;
-        console.log(URL.createObjectURL(uploadFile));
-        $(".upload-img-frame")
-          .attr("src", URL.createObjectURL(uploadFile))
-          .addClass("success");
-        filename = $(this)[0].files[0].name;
-        $(this).siblings(".upload-name").val(filename);
-      }
+    if (!isValidPhone(phone)) {
+      e.preventDefault();
+      alert("Please enter a valid 10-digit phone number");
+      return false;
+    }
+
+    if (password.length < 6) {
+      e.preventDefault();
+      alert("Password must be at least 6 characters long");
+      return false;
     }
   });
+
+  // Email validation helper function
+  function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  // Phone validation helper function
+  function isValidPhone(phone) {
+    const phoneRegex = /^[0-9]{10}$/;
+    return phoneRegex.test(phone);
+  }
+
+  // Format phone number as user types
+  $("#memberPhone").on("input", function () {
+    let value = $(this).val().replace(/\D/g, "");
+    if (value.length > 10) {
+      value = value.slice(0, 10);
+    }
+    $(this).val(value);
+  });
 });
-
-function validateSignupForm() {
-  const memberNick = $(".member-nick").val(),
-    memberPhone = $(".member-phone").val(),
-    memberPassword = $(".member-password").val(),
-    confirmPassword = $(".confirm-password").val();
-
-  if (
-    memberNick === "" ||
-    memberPhone === "" ||
-    memberPassword === "" ||
-    confirmPassword === ""
-  ) {
-    alert("Please insert all required inputs");
-    return false;
-  }
-
-  if (memberPassword !== confirmPassword) {
-    alert("Passwords do not match");
-    return false;
-  }
-
-  const memberImage = $(".member-image")?.get(0)?.files[0]
-    ? $(".member-image").get(0).files[0].name
-    : null;
-  if (!memberImage) {
-    alert("Please upload a restaurant image");
-    return false;
-  }
-}

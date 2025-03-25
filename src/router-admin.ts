@@ -7,7 +7,11 @@ import makeUploader from "./libs/utils/uploader";
 const routerAdmin = express.Router();
 
 /** Home **/
-routerAdmin.get("/", adminController.verifyAdmin, adminController.goHome);
+routerAdmin.get(
+  "/",
+  // adminController.verifyAdmin,
+  adminController.goHome
+);
 
 /** Admin Auth **/
 routerAdmin

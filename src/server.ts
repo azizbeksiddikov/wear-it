@@ -3,7 +3,8 @@ dotenv.config();
 import mongoose from "mongoose";
 import app from "./app";
 
-const PORT = process.env.PORT ?? 3003;
+// const PORT = process.env.PORT ?? 3003;
+const PORT = 3003;
 const MONGO_URL = process.env.MONGO_URL;
 
 if (!MONGO_URL) {

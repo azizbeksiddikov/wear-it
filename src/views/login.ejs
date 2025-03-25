@@ -1,45 +1,57 @@
 <%- include('includes/header') %>
 
-<link rel="stylesheet" type="text/css" href="/css/login.css" />
+<!-- Login CSS -->
+<link rel="stylesheet" href="/css/login.css" />
 
 <body>
-  <form class="login-container" action="/admin/login" METHOD="POST">
-    <div class="login-frame">
-      <div class="login-top">
-        <span>Enter</span>
-        <div>Go back <a href="/admin" style="color: #6440fb">Home</a></div>
-        <p>
-          Not registered yet?
-          <a href="/admin/signup" style="color: #6440fb">Signup</a>
-        </p>
-      </div>
-      <div class="login-input-frame">
-        <div class="login-input-container">
-          <label>Restaurant *</label>
-          <input
-            type="text"
-            name="memberNick"
-            class="member-nick"
-            placeholder="Username"
-            value=""
-            required
-          />
+  <%- include('includes/navbar') %>
+
+  <div class="container">
+    <div class="row justify-content-center align-items-center min-vh-100">
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card login-card shadow">
+          <div class="card-body p-5">
+            <h2 class="text-center mb-4">Login</h2>
+            <form action="/admin/login" method="POST">
+              <div class="mb-3">
+                <label for="memberEmail" class="form-label"
+                  >Email address</label
+                >
+                <input
+                  type="email"
+                  class="form-control"
+                  id="memberEmail"
+                  name="memberEmail"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="memberPassword" class="form-label">Password</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="memberPassword"
+                  name="memberPassword"
+                  required
+                />
+              </div>
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Login</button>
+              </div>
+            </form>
+            <div class="text-center mt-3">
+              <p class="mb-0">
+                Don't have an account? <a href="/admin/signup">Sign up</a>
+              </p>
+            </div>
+          </div>
         </div>
-        <div class="login-input-container">
-          <label>Password *</label>
-          <input
-            type="password"
-            name="memberPassword"
-            class="member-password"
-            placeholder="Password"
-            value=""
-            required
-          />
-        </div>
       </div>
-      <button class="login-btn btn" name="login" type="submit">Login</button>
     </div>
-  </form>
+  </div>
+
+  <!-- Login JS -->
+  <script src="/js/login.js"></script>
 </body>
 
 <%- include('includes/footer') %>
