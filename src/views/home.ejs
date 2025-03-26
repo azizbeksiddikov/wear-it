@@ -2,7 +2,11 @@
 
 <!-- Home CSS -->
 <link rel="stylesheet" href="/css/home.css" />
-
+<!-- Animate.css -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+/>
 <body>
   <%- include('includes/navbar') %>
 
@@ -10,7 +14,31 @@
   <div id="vanta-background"></div>
 
   <div class="home">
-    <h1>Home</h1>
+    <div class="container">
+      <% if (member) { %>
+
+      <h1 class="welcome-text">Welcome Back!</h1>
+      <h2 class="username">Admin Dashboard</h2>
+      <div class="dashboard-stats">
+        <div class="stat-card">
+          <div class="stat-number"><%= dashboard.totalMembers || 0 %></div>
+          <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number"><%= dashboard.totalProducts || 0 %></div>
+          <div class="stat-label">Active Products</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number"><%= dashboard.totalOrders || 0 %></div>
+          <div class="stat-label">Total Orders</div>
+        </div>
+      </div>
+
+      <% } else { %>
+      <h2 class="username">Admin Dashboard</h2>
+      <p class="no-auth">Please login to access the dashboard</p>
+      <% } %>
+    </div>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
@@ -29,6 +57,25 @@
     });
   </script>
   <script src="/js/home.js"></script>
+
+  <!-- Animate.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+  <script>
+    anime({
+      targets: ".stat-number",
+      innerHTML: [
+        0,
+        function (el) {
+          return el.innerHTML; // This reads the original value and animates toward it
+        },
+      ],
+      round: 1,
+      duration: 1000,
+      delay: anime.stagger(200),
+      easing: "easeInOutExpo",
+    });
+  </script>
 </body>
 
 <%- include('includes/footer') %>

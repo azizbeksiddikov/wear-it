@@ -9,6 +9,7 @@ import {
 } from "../libs/types/member";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import { MemberType } from "../libs/enums/member.enum";
+import { Dashboard } from "../libs/types/dashboard";
 
 const adminController: T = {},
   memberService = new MemberService();
@@ -16,7 +17,13 @@ const adminController: T = {},
 /** Home **/
 adminController.goHome = async (req: AdminRequest, res: Response) => {
   console.log("goHome");
-  res.render("home");
+  let dashboard = {};
+
+  if (req.session?.member?.memberType === MemberType.ADMIN) {
+    dashboard = await memberService.getDashboard();
+  }
+  console.log("dashboard", dashboard);
+  res.render("home", { dashboard: dashboard });
 };
 
 /** Admin Auth **/
@@ -32,12 +39,8 @@ adminController.getSignup = async (req: Request, res: Response) => {
 adminController.processSignup = async (req: AdminRequest, res: Response) => {
   try {
     console.log("processSignup");
-    // const file = req.file;
-    // if (!file)
-    //   throw new Errors(HttpCode.BAD_REQUEST, Message.FILE_UPLOAD_FAILED);
 
     const newMember: MemberInput = req.body;
-    // newMember.memberImage = file?.path.replace(/\\/g, "");
     newMember.memberType = MemberType.ADMIN;
     const result = await memberService.processSignup(newMember);
 
@@ -75,7 +78,7 @@ adminController.processLogin = async (req: AdminRequest, res: Response) => {
     req.session.member = member;
 
     req.session.save(function () {
-      res.redirect("/admin/product/all");
+      res.redirect("/admin");
     });
   } catch (err) {
     const message =

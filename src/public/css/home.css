@@ -8,17 +8,174 @@
   z-index: -1; /* Places it behind other content */
 }
 
-/* Main content area styling */
-.products-content {
-  position: relative;
-  z-index: 1; /* Ensures content is above the background */
-  padding: 20px;
-  color: white; /* For better visibility against the animation */
-  /* Add more styling as needed */
+.home {
+  padding-top: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Style for navbar to ensure it's above the background */
-nav {
+.home .container {
   position: relative;
-  z-index: 2;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 3rem;
+  border-radius: 25px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 1s ease-out;
+  width: 90%;
+  max-width: 1200px;
+}
+
+.home .welcome-text {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  background: linear-gradient(45deg, #3498db, #2ecc71);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: slideInLeft 1s ease-out;
+}
+
+.home .username {
+  font-size: 2.5rem;
+  color: #2c3e50;
+  margin-bottom: 2rem;
+  animation: slideInRight 1s ease-out;
+}
+
+.home .no-auth {
+  font-size: 1.5rem;
+  color: #34495e;
+  animation: slideInRight 1s ease-out;
+}
+
+.home .dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.home .stat-card {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 1.5rem;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+  animation: fadeInUp 0.5s ease-out;
+}
+.home .stat-card:hover {
+  transform: translateY(-5px);
+}
+.home .stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #3498db;
+  margin-bottom: 0.5rem;
+}
+
+.home .stat-label {
+  color: #7f8c8d;
+  font-size: 1.1rem;
+}
+
+/* Responsive design */
+@media screen and (max-width: 768px) {
+  .home {
+    padding-top: 60px;
+  }
+
+  .home .container {
+    padding: 1.5rem;
+    width: 95%;
+  }
+
+  .home .welcome-text {
+    font-size: 2.5rem;
+  }
+
+  .home .username {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .home .dashboard-stats {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .home .stat-card {
+    padding: 1rem;
+  }
+
+  .home .stat-number {
+    font-size: 1.7rem;
+  }
+
+  .home .stat-label {
+    font-size: 1rem;
+  }
+
+  .home .no-auth {
+    font-size: 1.1rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .home {
+    padding-top: 40px;
+  }
+
+  .home .container {
+    padding: 1rem;
+  }
+
+  .home .welcome-text {
+    font-size: 2rem;
+  }
+
+  .home .username {
+    font-size: 1.5rem;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

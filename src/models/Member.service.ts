@@ -1,3 +1,4 @@
+import { Dashboard } from "../libs/types/dashboard";
 import { shapeIntoMongooseObjectId } from "../libs/config";
 import { MemberStatus, MemberType } from "../libs/enums/member.enum";
 import Errors, { HttpCode, Message } from "../libs/Errors";
@@ -10,12 +11,19 @@ import {
 } from "../libs/types/member";
 import MemberModel from "../schema/Member.model";
 import * as bcryptjs from "bcryptjs";
+import OrderModel from "../schema/Order.model";
+import ProductModel from "../schema/Product.model";
+import { OrderStatus } from "../libs/enums/order.enum";
 
 class MemberService {
   private readonly memberModel;
+  private readonly orderModel;
+  private readonly productModel;
 
   constructor() {
     this.memberModel = MemberModel;
+    this.orderModel = OrderModel;
+    this.productModel = ProductModel;
   }
 
   /** USER **/
@@ -161,6 +169,39 @@ class MemberService {
     if (!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
 
     return result as unknown as Member;
+  }
+
+  public async getDashboard(): Promise<Dashboard> {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const totalMembers = await this.memberModel
+      .countDocuments({
+        memberStatus: MemberStatus.ACTIVE,
+      })
+      .exec();
+
+    const lastMonthProducts = await this.productModel
+      .countDocuments({
+        isActive: true,
+        updatedAt: { $gte: thirtyDaysAgo },
+      })
+      .exec();
+
+    const lastMonthOrders = await this.orderModel
+      .countDocuments({
+        orderStatus: OrderStatus.PAID,
+        updatedAt: { $gte: thirtyDaysAgo },
+      })
+      .exec();
+
+    const result = {
+      totalMembers: totalMembers,
+      totalOrders: lastMonthOrders,
+      totalProducts: lastMonthProducts,
+    };
+
+    return result as Dashboard;
   }
 }
 
