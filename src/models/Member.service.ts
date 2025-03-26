@@ -14,6 +14,7 @@ import * as bcryptjs from "bcryptjs";
 import OrderModel from "../schema/Order.model";
 import ProductModel from "../schema/Product.model";
 import { OrderStatus } from "../libs/enums/order.enum";
+import { T } from "../libs/types/common";
 
 class MemberService {
   private readonly memberModel;
@@ -125,32 +126,24 @@ class MemberService {
   }
 
   public async getUsers(input: MemberInquiry): Promise<Member[]> {
-    const { page, limit, text } = input;
-    const skip = (page - 1) * limit;
+    const { text } = input;
 
-    const filter: any = { memberType: MemberType.USER };
-    if (text) filter.memberEmail = { $regex: text, $options: "i" };
+    const match: T = { memberType: MemberType.USER };
+    if (text) match.memberEmail = { $regex: text, $options: "i" };
 
-    const result = await this.memberModel
-      .find(filter)
-      .skip(skip)
-      .limit(limit)
-      .exec();
+    const result = await this.memberModel.find(match).exec();
 
     if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
 
     return result as unknown as Member[];
   }
 
-  public async updateChosenUser(
-    inputId: string,
-    input: MemberUpdateInput
-  ): Promise<Member> {
-    input._id = shapeIntoMongooseObjectId(inputId);
+  public async updateChosenUser(input: MemberUpdateInput): Promise<Member> {
+    input._id = shapeIntoMongooseObjectId(input._id);
+
     const result = await this.memberModel
-      .findByIdAndUpdate({ _id: input._id }, input, {
+      .findByIdAndUpdate(input._id, input, {
         new: true,
-        runValidators: true,
         lean: true,
       })
       .exec();

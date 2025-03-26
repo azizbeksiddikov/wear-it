@@ -7,11 +7,7 @@ import makeUploader from "./libs/utils/uploader";
 const routerAdmin = express.Router();
 
 /** Home **/
-routerAdmin.get(
-  "/",
-  //  adminController.verifyAdmin,
-  adminController.goHome
-);
+routerAdmin.get("/", adminController.goHome);
 
 /** Admin Auth **/
 routerAdmin.get("/signup", adminController.getSignup).post(
@@ -41,7 +37,7 @@ routerAdmin.get(
 ); // + orders
 
 routerAdmin.post(
-  "/user/:id",
+  "/user/edit",
   adminController.verifyAdmin,
   adminController.updateChosenUser
 );

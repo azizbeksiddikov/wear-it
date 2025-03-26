@@ -1,26 +1,77 @@
 <%- include('includes/header') %>
 
-    <!-- Users CSS -->
-    <link rel="stylesheet" href="/css/users.css" />
-  </head>
+  <link rel="stylesheet" href="/css/users.css" />
+
   <body>
     <%- include('includes/navbar') %>
 
-   <div class ="users">
-    <div class="users-container">
-        <div class="page-header">
-          <h1>Users Management</h1>
-          <div class="search-box">
-            <input
-              type="text"
-              id="searchInput"
-              placeholder="Search user email"
-              class="form-control"
-            />
-          </div>
-        </div>
-  
+    <div class="users">
+      <div class="header">
+        <h1>Users Management</h1>
+      </div>
+
+      <div class="users-table">
+        <% if (users.length > 0) { %>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Status</th>
+              <th>Points</th>
+            </tr>
+          </thead>
+
+          <tbody>
+              <% users.forEach(user => { %>
+              <tr>
+                <!-- user-bio -->
+                <td>
+                  <div class="user-bio">
+                    <a href="admin/users/<%= user._id %>">
+                      <img src="<%= user.memberImage ?? "/img/default-user.webp"
+                      %>" alt="<%= user.memberFullName %>" class="users-avatar" />
+                      <div class="users-details">
+                        <div class="users-name">
+                          <%= user.memberFullName ?? "No name"%>
+                        </div>
+                        <div class="users-email"><%= user.memberEmail %></div>
+                      </div>
+                    </a>
+                  </div>
+                </td>
+
+                <!-- status -->
+                <td>
+                  <div class="users-status">
+                    <!-- Added data-status attribute for static CSS styling -->
+                    <select id="<%= user._id %>" class="users-status-select" data-status="<%= user.memberStatus %>">
+                      <option value="ACTIVE" <%= user.memberStatus ==='ACTIVE' ? "selected" : "" %>> ACTIVE</option>
+                      <option value="BLOCKED" <%= user.memberStatus==="BLOCKED" ? "selected" : "" %>> BLOCKED</option>
+                      <option value="DELETED" <%= user.memberStatus==="DELETED" ? "selected" : "" %>> DELETED</option>
+                    </select>
+                  </div>
+                </td>
+
+                <!-- points -->
+                <td>
+                  <div class="users-points-badge"><%= user.memberPoints ?? 0 %></div>
+                </td>
+              </tr>
+              <% }); %>
      
+          </tbody>
+        </table>
+        <% } else { %>
+          <div class="empty-state">
+            <i class="bi bi-people"></i>
+            <h3>No users found</h3>
+            <p>There are no users in the system yet or your search returned no results.</p>
+          </div>
+    <% } %>
+      </div>
+    </div>
+
     <!-- Users JS -->
     <script src="/js/users.js"></script>
   </body>

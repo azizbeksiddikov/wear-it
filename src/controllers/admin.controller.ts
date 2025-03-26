@@ -22,7 +22,6 @@ adminController.goHome = async (req: AdminRequest, res: Response) => {
   if (req.session?.member?.memberType === MemberType.ADMIN) {
     dashboard = await memberService.getDashboard();
   }
-  console.log("dashboard", dashboard);
   res.render("home", { dashboard: dashboard });
 };
 
@@ -149,16 +148,9 @@ adminController.getUsers = async (req: AdminRequest, res: Response) => {
   try {
     console.log("getUsers");
 
-    const { page = 1, limit = 10, text } = req.query;
-    const input: MemberInquiry = {
-      page: Number(page),
-      limit: Number(limit),
-      text: text ? String(text) : undefined,
-    };
+    const users = await memberService.getUsers(req.query);
 
-    const users = await memberService.getUsers(input);
-
-    res.render("users", { users });
+    res.render("users", { users: users });
   } catch (err) {
     console.error("Error, getUsers:", err);
     res.redirect("/admin");
@@ -183,9 +175,7 @@ adminController.getChosenUser = async (req: AdminRequest, res: Response) => {
 adminController.updateChosenUser = async (req: AdminRequest, res: Response) => {
   try {
     console.log("updateChosenUser");
-
-    const id = req.params.id;
-    const result = await memberService.updateChosenUser(id, req.body);
+    const result = await memberService.updateChosenUser(req.body);
 
     res.status(HttpCode.OK).json({ data: result });
   } catch (err) {

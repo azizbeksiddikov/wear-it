@@ -42,6 +42,7 @@ export interface MemberUpdateInput {
   memberDesc?: string;
   memberImage?: string;
   memberPoints?: number;
+  memeberStatus?: MemberStatus;
 }
 
 export interface LoginInput {
@@ -50,8 +51,6 @@ export interface LoginInput {
 }
 
 export interface MemberInquiry {
-  page: number;
-  limit: number;
   text?: string;
 }
 
