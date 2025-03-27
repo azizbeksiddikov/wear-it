@@ -39,10 +39,12 @@ export interface Product {
   productDesc?: string;
   productImages?: string[];
   isActive: boolean;
-  isFeatured?: boolean;
-  onSale?: boolean;
+  isFeatured: boolean;
+  onSale: boolean;
   createdAt: Date;
   updatedAt: Date;
+
+  productVariants?: ProductVariant[];
 }
 
 export interface ProductInput {

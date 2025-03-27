@@ -65,7 +65,39 @@ routerAdmin.get(
 routerAdmin.post(
   "/product/edit",
   adminController.verifyAdmin,
+  makeUploader("products").array("productImages", 9),
   productController.updateChosenProduct
+);
+
+routerAdmin.post(
+  "/product/delete",
+  adminController.verifyAdmin,
+  productController.deleteChosenProduct
+);
+
+/** Product Variant Management **/
+routerAdmin.post(
+  "/product-variant/create",
+  adminController.verifyAdmin,
+  productController.createNewProductVariant
+);
+
+routerAdmin.post(
+  "/product-variant/edit",
+  adminController.verifyAdmin,
+  productController.updateChosenProductVariant
+);
+
+routerAdmin.get(
+  "/product-variants/:productId",
+  adminController.verifyAdmin,
+  productController.getAllProductVariants
+);
+
+routerAdmin.post(
+  "/product-variant/delete",
+  adminController.verifyAdmin,
+  productController.deleteChosenProductVariant
 );
 
 export default routerAdmin;

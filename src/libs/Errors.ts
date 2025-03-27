@@ -14,6 +14,7 @@ export enum Message {
   NO_DATA_FOUND = "No data is found!",
   CREATE_FAILED = "Create is failed!",
   UPDATE_FAILED = "Update is failed!",
+  DELETE_FAILED = "Delete is failed!",
 
   NO_MEMBER_EMAIL = "No member with that email",
   USED_EMAIL_PHONE = "Already used phone or email",

@@ -35,6 +35,11 @@ const productVariantSchema = new Schema(
   { timestamps: true }
 );
 
+productVariantSchema.index(
+  { productId: 1, size: 1, color: 1 },
+  { unique: true }
+);
+
 export default mongoose.model(
   "ProductVariant",
   productVariantSchema,

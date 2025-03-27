@@ -8,7 +8,6 @@ $(document).ready(function () {
     const phone = $("#memberPhone").val();
 
     // Email check
-    // Email check
     if (!email || !email.includes("@") || email.split("@")[1].length < 3) {
       alert("Please enter a valid email address");
       return;

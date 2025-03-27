@@ -2,11 +2,17 @@ import { AdminRequest } from "../libs/types/member";
 import { Request, Response } from "express";
 import { T } from "../libs/types/common";
 import ProductService from "../models/Product.service";
-import { Product, ProductInput } from "../libs/types/product";
+import {
+  Product,
+  ProductInput,
+  ProductUpdateInput,
+  ProductVariantInput,
+  ProductVariantUpdate,
+} from "../libs/types/product";
 import Errors from "../libs/Errors";
 import { HttpCode } from "../libs/Errors";
 import { Message } from "../libs/Errors";
-import { DOMAIN_NAME } from "../libs/config";
+import { DOMAIN_NAME, shapeIntoMongooseObjectId } from "../libs/config";
 
 const productController: T = {},
   productService = new ProductService();
@@ -15,7 +21,7 @@ const productController: T = {},
 productController.getProducts = async () => {};
 productController.getProduct = async () => {}; // + reviews
 
-// SSR
+// ADMIN
 productController.getAllProducts = async (req: AdminRequest, res: Response) => {
   try {
     console.log("getAllProducts");
@@ -69,8 +75,24 @@ productController.getChosenProduct = async (
   req: AdminRequest,
   res: Response
 ) => {
-  console.log("getChosenProduct");
-  res.redirect("/admin/product/all");
+  try {
+    console.log("getChosenProduct");
+
+    const productId = shapeIntoMongooseObjectId(req.params.id);
+
+    const result = await productService.getChosenProduct(productId);
+    res.render("product", {
+      product: result,
+      DOMAIN_NAME: DOMAIN_NAME,
+    });
+  } catch (err) {
+    console.log("Error, updateChosenProduct:", err);
+    const message =
+      err instanceof Errors ? err.message : Message.SOMETHING_WENT_WRONG;
+    res.send(
+      `<script> alert("${message}"); window.location.replace("/admin/signup");</script>`
+    );
+  }
 };
 
 productController.updateChosenProduct = async (
@@ -80,6 +102,14 @@ productController.updateChosenProduct = async (
   try {
     console.log("updateChosenProduct");
 
+    const data: ProductUpdateInput = req.body;
+
+    if (req.files?.length) {
+      data.productImages = req.files.map((ele) => {
+        return ele.path.replace(/\\/g, "");
+      });
+    }
+
     const result = await productService.updateChosenProduct(req.body);
 
     res.status(HttpCode.OK).json({ product: result });
@@ -88,7 +118,124 @@ productController.updateChosenProduct = async (
     const message =
       err instanceof Errors ? err.message : Message.SOMETHING_WENT_WRONG;
     res.send(
-      `<script> alert("${message}"); window.location.replace("/admin/signup");</script>`
+      `<script> alert("${message}"); window.location.replace("/admin/product/all");</script>`
+    );
+  }
+};
+
+productController.deleteChosenProduct = async (
+  req: AdminRequest,
+  res: Response
+) => {
+  try {
+    console.log("deleteChosenProduct");
+    const productId = shapeIntoMongooseObjectId(req.body.id);
+    const result = await productService.deleteChosenProduct(productId);
+
+    res.status(HttpCode.OK).json({ product: result });
+  } catch (err) {
+    console.log("Error, deleteChosenProduct:", err);
+    const message =
+      err instanceof Errors ? err.message : Message.SOMETHING_WENT_WRONG;
+    res.send(
+      `<script> alert("${message}"); window.location.replace("/admin/product/all");</script>`
+    );
+  }
+};
+
+// Product Variants
+productController.createNewProductVariant = async (
+  req: AdminRequest,
+  res: Response
+) => {
+  try {
+    console.log("createNewProductVariant");
+
+    const data = req.body;
+    console.log("data", data);
+    data.productId = shapeIntoMongooseObjectId(data.productId);
+    const result = await productService.createNewProductVariant(data);
+    console.log("result", result);
+    res.status(HttpCode.OK).json({ productVariant: result });
+  } catch (err) {
+    console.log("Error, updateChosenProduct:", err);
+    const message =
+      err instanceof Errors ? err.message : Message.SOMETHING_WENT_WRONG;
+    res.send(
+      `<script> alert("${message}"); window.location.replace("/admin/product/all");</script>`
+    );
+  }
+};
+
+productController.updateChosenProductVariant = async (
+  req: AdminRequest,
+  res: Response
+) => {
+  try {
+    console.log("updateChosenProductVariant");
+
+    const data: ProductVariantUpdate = req.body;
+    data._id = shapeIntoMongooseObjectId(data._id);
+
+    const result = await productService.updateChosenProductVariant(data);
+
+    res.status(HttpCode.OK).json({
+      productVariant: result,
+    });
+  } catch (err) {
+    console.log("Error, updateChosenProductVariant:", err);
+    const message =
+      err instanceof Errors ? err.message : Message.SOMETHING_WENT_WRONG;
+    res.send(
+      `<script> alert("${message}"); window.location.replace("/admin/product/all");</script>`
+    );
+  }
+};
+
+productController.getAllProductVariants = async (
+  req: AdminRequest,
+  res: Response
+) => {
+  try {
+    console.log("getProductVariants");
+
+    const productId = shapeIntoMongooseObjectId(req.params.productId);
+    const result = await productService.getAllProductVariants(productId);
+
+    res.status(HttpCode.OK).json({
+      productVariants: result,
+    });
+  } catch (err) {
+    console.log("Error, getProductVariants:", err);
+    const message =
+      err instanceof Errors ? err.message : Message.SOMETHING_WENT_WRONG;
+    res.send(
+      `<script> alert("${message}"); window.location.replace("/admin/product/all");</script>`
+    );
+  }
+};
+
+productController.deleteChosenProductVariant = async (
+  req: AdminRequest,
+  res: Response
+) => {
+  try {
+    console.log("deleteChosenProductVariant");
+
+    const productVariantId = shapeIntoMongooseObjectId(req.body.id);
+    const result = await productService.deleteChosenProductVariant(
+      productVariantId
+    );
+
+    res.status(HttpCode.OK).json({
+      productVariant: result,
+    });
+  } catch (err) {
+    console.log("Error, getProductVariants:", err);
+    const message =
+      err instanceof Errors ? err.message : Message.SOMETHING_WENT_WRONG;
+    res.send(
+      `<script> alert("${message}"); window.location.replace("/admin/product/all");</script>`
     );
   }
 };
