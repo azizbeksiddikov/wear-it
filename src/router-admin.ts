@@ -52,17 +52,18 @@ routerAdmin.get(
 routerAdmin.post(
   "/product/create",
   adminController.verifyAdmin,
+  makeUploader("products").array("productImages", 10),
   productController.createNewProduct
-); //   makeUploader("products").array("productImages", 5)
+);
 
 routerAdmin.get(
   "/product/:id",
   adminController.verifyAdmin,
-  productController.getChosenProduct // + reviews
+  productController.getChosenProduct
 );
 
 routerAdmin.post(
-  "/product/:id",
+  "/product/edit",
   adminController.verifyAdmin,
   productController.updateChosenProduct
 );

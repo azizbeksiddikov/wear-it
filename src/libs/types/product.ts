@@ -1,8 +1,9 @@
 import { ObjectId } from "mongoose";
+import { ProductCategory, ProductGender } from "../enums/product.enum";
 
 export interface ProductVariant {
   _id: ObjectId;
-  productId: ObjectId;
+  productId: ObjectId; // Product
   size: string;
   color: string;
   stockQuantity: number;
@@ -33,12 +34,39 @@ export interface ProductVariantUpdate {
 export interface Product {
   _id: ObjectId;
   productName: string;
+  productCategory: ProductCategory;
+  productGender: ProductGender;
   productDesc?: string;
-  onSale?: boolean;
-  categoryId: ObjectId;
-  isFeatured?: boolean;
+  productImages?: string[];
   isActive: boolean;
-
+  isFeatured?: boolean;
+  onSale?: boolean;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface ProductInput {
+  productName: string;
+  productCategory: ProductCategory;
+  productGender: ProductGender;
+  productDesc?: string;
+  productImages?: string[];
+}
+
+export interface ProductUpdateInput {
+  _id: ObjectId;
+  productName?: string;
+  productCategory?: ProductCategory;
+  productGender?: ProductGender;
+  productDesc?: string;
+  productImages?: string[];
+  isActive?: boolean;
+  isFeatured?: boolean;
+  onSale?: boolean;
+}
+
+export interface ProductInquiry {
+  productCategory?: ProductCategory;
+  productGender?: ProductGender;
+  isActive?: boolean;
 }

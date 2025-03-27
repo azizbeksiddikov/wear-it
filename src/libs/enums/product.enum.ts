@@ -1,18 +1,18 @@
-export enum productStatus {
+export enum ProductStatus {
   ACTIVE = "ACTIVE",
   FEATURED = "FEATURED",
   SALE = "SALE",
-  FROZEN = "FROZEN",
+  PAUSED = "PAUSED",
   DELETE = "DELETED",
 }
 
-export enum productGender {
+export enum ProductGender {
   MEN = "MEN",
   WOMEN = "WOMEN",
   UNISEX = "UNISEX",
 }
 
-export enum productCategory {
+export enum ProductCategory {
   TOPS = "TOPS",
   JEANS = "JEANS",
   JACKETS = "JACKETS",
@@ -23,4 +23,5 @@ export enum productCategory {
   FORMALWEAR = "FORMALWEAR",
   SLEEPWEAR = "SLEEPWEAR",
   TRADITIONAL = "TRADITIONAL",
+  OTHER = "OTHER",
 }

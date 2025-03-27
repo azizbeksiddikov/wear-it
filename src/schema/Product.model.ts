@@ -1,8 +1,8 @@
 import mongoose, { Schema } from "mongoose";
 import {
-  productCategory,
-  productGender,
-  productStatus,
+  ProductCategory,
+  ProductGender,
+  ProductStatus,
 } from "../libs/enums/product.enum";
 
 const productSchema = new Schema(
@@ -10,36 +10,44 @@ const productSchema = new Schema(
     productName: {
       type: String,
       required: true,
-      minlength: 2,
     },
 
-    productDescription: {
+    productCategory: {
       type: String,
-    },
-
-    gender: {
-      type: String,
-      required: true,
-      enum: productGender,
-    },
-
-    categoryId: {
-      type: String,
-      enum: productCategory,
+      enum: ProductCategory,
       required: true,
     },
 
-    productType: {
+    productGender: {
       type: String,
-      enum: productStatus,
-      default: productStatus.ACTIVE,
+      enum: ProductGender,
+      required: true,
+    },
+
+    productDesc: {
+      type: String,
     },
 
     productImages: {
       type: [String],
-      required: true,
+    },
+
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
+
+    isFeatured: {
+      type: Boolean,
+      default: false,
+    },
+
+    onSale: {
+      type: Boolean,
+      default: false,
     },
   },
+
   { timestamps: true }
 );
 
