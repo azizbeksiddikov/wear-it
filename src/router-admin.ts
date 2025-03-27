@@ -52,7 +52,7 @@ routerAdmin.get(
 routerAdmin.post(
   "/product/create",
   adminController.verifyAdmin,
-  makeUploader("products").array("productImages", 10),
+  makeUploader("products").array("productImages", 9),
   productController.createNewProduct
 );
 

@@ -143,8 +143,8 @@ function validateProductForm() {
     document.querySelectorAll(".image-input")
   ).filter((input) => input.files.length > 0).length;
 
-  if (imageCount > 10) {
-    alert("You can upload a maximum of 10 images.");
+  if (imageCount > 9) {
+    alert("You can upload a maximum of 9 images.");
     return false;
   }
 
