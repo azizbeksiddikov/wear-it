@@ -221,6 +221,14 @@
   color: #e74c3c;
 }
 
+.signup .password-helper {
+  color: #e74c3c;
+  font-size: 0.8em;
+  margin-top: -0.5rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
 /* Responsive Adjustments */
 @media screen and (max-width: 768px) {
   .signup .signup-container {
