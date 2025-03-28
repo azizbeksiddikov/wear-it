@@ -165,7 +165,7 @@ adminController.getChosenUser = async (req: AdminRequest, res: Response) => {
     const id = req.params.id;
     const result: Member = await memberService.getChosenUser(id);
 
-    res.render("user", { user: result });
+    res.render("user", { member: result });
   } catch (err) {
     console.log("Error, getChosenUser:", err);
     if (err instanceof Errors) res.status(err.code).json(err);
