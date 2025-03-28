@@ -80,13 +80,23 @@ class ProductService {
   }
 
   public async deleteChosenProduct(productId: ObjectId): Promise<Product> {
+    const variantIds = await this.getAllProductVariants(productId);
+
+    console.log("variantIds", variantIds);
+
+    console.log("productId", productId);
+
     const result = await this.productModel
-      .findById(productId, { new: true })
+      .findByIdAndDelete(productId, { new: true })
       .exec();
 
     if (!result) {
       throw new Errors(HttpCode.NOT_MODIFIED, Message.DELETE_FAILED);
     }
+
+    await Promise.all(
+      variantIds.map((variant) => this.deleteChosenProductVariant(variant._id))
+    );
 
     return result as unknown as Product;
   }
@@ -95,13 +105,15 @@ class ProductService {
   public async createNewProductVariant(
     input: ProductVariantInput
   ): Promise<ProductVariant> {
-    // Verify that the referenced product exists
     const productExists = await this.productModel.findById({
       _id: input.productId,
     });
     if (!productExists) {
       throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
     }
+    input.color = input.color.toUpperCase();
+    input.size = input.size.toUpperCase();
+
     try {
       const result = await this.productVariantModel.create(input);
 
@@ -115,10 +127,11 @@ class ProductService {
   public async updateChosenProductVariant(
     input: ProductVariantUpdate
   ): Promise<ProductVariant> {
-    const variantId = shapeIntoMongooseObjectId(input._id);
+    if (input.color) input.color = input.color.toUpperCase();
+    if (input.size) input.size = input.size.toUpperCase();
 
     const result = await this.productVariantModel
-      .findByIdAndUpdate(variantId, input, { new: true })
+      .findByIdAndUpdate(input._id, input, { new: true })
       .exec();
 
     if (!result) {

@@ -1,479 +1,465 @@
 document.addEventListener("DOMContentLoaded", function () {
   // Initialize all features
-  initCarousel();
-  initProductHandlers();
-  initVariantHandlers();
+  const ProductManager = {
+    init() {
+      this.initCarousel();
+      this.initProductHandlers();
+      this.initVariantHandlers();
+    },
 
-  function initProductHandlers() {
-    // Product status toggles
-    const productId = document.getElementById("productId")?.value;
+    getProductId() {
+      return document.getElementById("productId")?.value;
+    },
 
-    document.querySelectorAll(".product-status-toggle").forEach((toggle) => {
-      toggle.addEventListener("change", () =>
-        updateProduct({
-          _id: productId,
-          [toggle.getAttribute("data-field")]: toggle.checked,
-        })
-      );
-    });
-
-    // Description editor
-    const editBtn = document.getElementById("product-desc-edit-btn");
-    const saveBtn = document.getElementById("product-desc-save-btn");
-    const cancelBtn = document.getElementById("product-desc-cancel-btn");
-    const displayEl = document.getElementById("product-desc-display");
-    const editEl = document.getElementById("product-desc-edit-container");
-    const textarea = document.getElementById("product-desc-textarea");
-
-    if (editBtn && saveBtn && cancelBtn) {
-      editBtn.addEventListener("click", () => {
-        displayEl.style.display = "none";
-        editEl.style.display = "block";
-        textarea.focus();
-      });
-
-      saveBtn.addEventListener("click", () => {
-        const newDesc = textarea.value.trim();
-        displayEl.querySelector("p").textContent =
-          newDesc || "No description available";
-        displayEl.style.display = "block";
-        editEl.style.display = "none";
-        updateProduct({ _id: productId, productDesc: newDesc });
-      });
-
-      cancelBtn.addEventListener("click", () => {
-        const currentText = displayEl.querySelector("p").textContent;
-        textarea.value =
-          currentText === "No description available" ? "" : currentText;
-        displayEl.style.display = "block";
-        editEl.style.display = "none";
-      });
-    }
-
-    // Product deletion
-    const deleteBtn = document.getElementById("product-delete-btn");
-    if (deleteBtn) {
-      deleteBtn.addEventListener("click", async function () {
-        if (
-          !this.disabled &&
-          confirm("Are you sure you want to delete this product?")
-        ) {
-          this.disabled = true;
-          try {
-            await axios.post("/admin/product/delete", { id: productId });
-            showNotification("Product deleted successfully", "success");
-            setTimeout(
-              () => (window.location.href = "/admin/product/all"),
-              1500
-            );
-          } catch (error) {
-            console.error("Error:", error);
-            showNotification("Error deleting product", "error");
-            this.disabled = false;
-          }
-        }
-      });
-    }
-  }
-
-  function initVariantHandlers() {
-    const $variantForm = $("#addVariantForm");
-    const $modal = $("#addVariantModal");
-    const $submitBtn = $modal.find('button[type="submit"]');
-    const $variantsTable = $(".variants-table tbody");
-    const $noVariantsMessage = $(".no-variants-message");
-
-    // Show modal
-    $("#create-variant-btn").on("click", () => {
-      $variantForm[0].reset();
-      $modal.modal("show");
-    });
-
-    // Form submission
-    $variantForm.on("submit", async function (e) {
-      e.preventDefault();
-      if ($submitBtn.prop("disabled")) return;
-
-      const formData = getFormData($(this));
-      const error = validateVariantData(formData);
-
-      if (error) {
-        showNotification(error, "error");
-        return;
-      }
-
-      console.log("****** 1 *****");
-      $submitBtn.prop("disabled", true);
+    async updateProduct(data) {
       try {
-        const response = await axios.post(
-          $(this).attr("action"),
-          processFormData(formData)
-        );
-
-        const variant = response.data.productVariant;
-
-        // Add new row to table
-        const newRow = createVariantRow(variant);
-        $variantsTable.append(newRow);
-
-        // Hide "no variants" message if it exists
-        $noVariantsMessage.hide();
-
-        // Initialize event handlers for new row
-        initializeRowHandlers(newRow);
-
-        $modal.modal("hide");
-        $variantForm[0].reset();
-        showNotification("Variant created successfully", "success");
+        await axios.post("/admin/product/edit", data);
+        showNotification("Product updated successfully", "success");
       } catch (error) {
         console.error("Error:", error);
-        showNotification(
-          error.response?.data?.message || "Error creating variant",
-          "error"
-        );
-      } finally {
-        $submitBtn.prop("disabled", false);
+        showNotification("Error updating product", "error");
       }
-    });
+    },
 
-    // Edit variants
-    document.querySelectorAll(".btn-edit-variant").forEach((btn) => {
-      btn.addEventListener("click", function () {
-        const row = this.closest("tr");
-        updateVariant({
-          _id: row.dataset.variantId,
-          size: row.querySelector('[data-field="size"] input').value,
-          color: row.querySelector('[data-field="color"] input').value,
-          stockQuantity: parseInt(
-            row.querySelector('[data-field="stockQuantity"] input').value
-          ),
-          productPrice: parseFloat(
-            row.querySelector('[data-field="productPrice"] input').value
-          ),
-          salePrice:
-            parseFloat(
-              row.querySelector('[data-field="salePrice"] input').value
-            ) || null,
-        });
+    async updateVariant(data) {
+      try {
+        console.log(data);
+        await axios.post("/admin/product-variant/edit", data);
+        // 1 second to see the console.log
+        await new Promise((r) => setTimeout(r, 1000));
+        showNotification("Variant updated successfully", "success");
+      } catch (error) {
+        console.error("Error:", error);
+        showNotification("Error updating variant", "error");
+      }
+    },
+
+    initProductHandlers() {
+      this.initStatusToggles();
+      this.initDescriptionEditor();
+      this.initDeleteProduct();
+    },
+
+    initStatusToggles() {
+      const productId = this.getProductId();
+      document.querySelectorAll(".product-status-toggle").forEach((toggle) => {
+        toggle.addEventListener("change", () =>
+          this.updateProduct({
+            _id: productId,
+            [toggle.getAttribute("data-field")]: toggle.checked,
+          })
+        );
       });
-    });
+    },
 
-    // Delete variants
-    document.querySelectorAll(".btn-delete-variant").forEach((btn) => {
-      btn.addEventListener("click", async function () {
+    initDescriptionEditor() {
+      const elements = {
+        editBtn: document.getElementById("product-desc-edit-btn"),
+        saveBtn: document.getElementById("product-desc-save-btn"),
+        cancelBtn: document.getElementById("product-desc-cancel-btn"),
+        displayEl: document.getElementById("product-desc-display"),
+        editEl: document.getElementById("product-desc-edit-container"),
+        textarea: document.getElementById("product-desc-textarea"),
+      };
+
+      if (!elements.editBtn || !elements.saveBtn || !elements.cancelBtn) return;
+
+      elements.editBtn.addEventListener("click", () => {
+        elements.displayEl.style.display = "none";
+        elements.editEl.style.display = "block";
+        elements.textarea.focus();
+      });
+
+      elements.saveBtn.addEventListener("click", () => {
+        const newDesc = elements.textarea.value.trim();
+        elements.displayEl.querySelector("p").textContent =
+          newDesc || "No description available";
+        elements.displayEl.style.display = "block";
+        elements.editEl.style.display = "none";
+        this.updateProduct({ _id: this.getProductId(), productDesc: newDesc });
+      });
+
+      elements.cancelBtn.addEventListener("click", () => {
+        const currentText = elements.displayEl.querySelector("p").textContent;
+        elements.textarea.value =
+          currentText === "No description available" ? "" : currentText;
+        elements.displayEl.style.display = "block";
+        elements.editEl.style.display = "none";
+      });
+    },
+
+    initDeleteProduct() {
+      const deleteBtn = document.getElementById("product-delete-btn");
+      if (!deleteBtn) return;
+
+      deleteBtn.addEventListener("click", async function () {
         if (
           this.disabled ||
-          !confirm("Are you sure you want to delete this variant?")
+          !confirm("Are you sure you want to delete this product?")
         )
           return;
 
         this.disabled = true;
-        const row = this.closest("tr");
         try {
-          await axios.post("/admin/product-variant/delete", {
-            id: row.dataset.variantId,
+          await axios.post("/admin/product/delete", {
+            id: ProductManager.getProductId(),
           });
-          row.remove();
-          showNotification("Variant deleted successfully", "success");
+          showNotification("Product deleted successfully", "success");
+          setTimeout(() => (window.location.href = "/admin/product/all"), 1500);
         } catch (error) {
           console.error("Error:", error);
-          showNotification("Error deleting variant", "error");
+          showNotification("Error deleting product", "error");
           this.disabled = false;
         }
       });
-    });
-  }
+    },
 
-  // Helper function to create a new variant row
-  function createVariantRow(variant) {
-    return `
-      <tr data-variant-id="${variant._id}">
-        <td class="editable-cell" data-field="size">
-          <input type="text" class="form-control edit-input" value="${variant.size.toUpperCase()}"/>
-        </td>
-        <td class="editable-cell" data-field="color">
-          <input type="text" class="form-control edit-input" value="${capitalizeWord(variant.color)}"/>
-        </td>
-        <td class="editable-cell" data-field="stockQuantity">
-          <input type="number" class="form-control edit-input" min="0" step="5" value="${
-            variant.stockQuantity
-          }"/>
-        </td>
-        <td class="editable-cell" data-field="productPrice">
-          <input type="number" class="form-control edit-input" min="0" step="5" value="${
-            variant.productPrice
-          }"/>
-        </td>
-        <td class="editable-cell" data-field="salePrice">
-          <input type="number" class="form-control edit-input" min="0" step="5" value="${
-            variant.salePrice || ""
-          }"/>
-        </td>
-        <td class="actions-cell">
-          <button class="btn-edit-variant" title="Edit variant">
-            <i class="fas fa-pencil-alt"></i>
-          </button>
-          <button class="btn-delete-variant" title="Delete variant">
-            <i class="fas fa-trash"></i>
-          </button>
-        </td>
-      </tr>
-    `;
-  }
+    initVariantHandlers() {
+      const VariantManager = {
+        elements: {
+          $form: $("#addVariantForm"),
+          $modal: $("#addVariantModal"),
+          $submitBtn: $("#addVariantModal button[type='submit']"),
+          $table: $(".variants-table tbody"),
+          $noVariantsMsg: $(".no-variants-message"),
+        },
 
-  function capitalizeWord(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-  }
+        init() {
+          this.initCreateVariant();
+          this.initEditDeleteButtons();
+        },
 
-  // Helper function to initialize event handlers for new row
-  function initializeRowHandlers($row) {
-    $row = $($row);
+        initCreateVariant() {
+          $("#create-variant-btn").on("click", () => {
+            this.elements.$form[0].reset();
+            this.elements.$modal.modal("show");
+          });
 
-    // Edit handler
-    $row.find(".btn-edit-variant").on("click", function () {
-      const data = {
-        _id: $row.data("variant-id"),
-        size: $row.find('[data-field="size"] input').val(),
-        color: $row.find('[data-field="color"] input').val(),
-        stockQuantity: parseInt(
-          $row.find('[data-field="stockQuantity"] input').val()
-        ),
-        productPrice: parseFloat(
-          $row.find('[data-field="productPrice"] input').val()
-        ),
-        salePrice:
-          parseFloat($row.find('[data-field="salePrice"] input').val()) || null,
-      };
-      updateVariant(data);
-    });
+          this.elements.$form.on("submit", this.handleVariantSubmit.bind(this));
+        },
 
-    // Delete handler
-    $row.find(".btn-delete-variant").on("click", async function () {
-      if (
-        $(this).prop("disabled") ||
-        !confirm("Are you sure you want to delete this variant?")
-      )
-        return;
+        async handleVariantSubmit(e) {
+          e.preventDefault();
+          if (this.elements.$submitBtn.prop("disabled")) return;
 
-      $(this).prop("disabled", true);
-      try {
-        await axios.post("/admin/product-variant/delete", {
-          id: $row.data("variant-id"),
-        });
-        $row.fadeOut(() => {
-          $row.remove();
-          if ($(".variants-table tbody tr").length === 0) {
-            $(".no-variants-message").show();
+          const formData = getFormData($(this.elements.$form));
+          const error = validateVariantData(formData);
+
+          if (error) {
+            showNotification(error, "error");
+            return;
           }
+
+          this.elements.$submitBtn.prop("disabled", true);
+          try {
+            const response = await axios.post(
+              this.elements.$form.attr("action"),
+              processFormData(formData)
+            );
+
+            this.addVariantToTable(response.data.productVariant);
+            this.elements.$modal.modal("hide");
+            this.elements.$form[0].reset();
+            showNotification("Variant created successfully", "success");
+          } catch (error) {
+            console.error("Error:", error);
+            showNotification(
+              error.response?.data?.message || "Error creating variant",
+              "error"
+            );
+          } finally {
+            this.elements.$submitBtn.prop("disabled", false);
+          }
+        },
+
+        addVariantToTable(variant) {
+          const newRow = createVariantRow(variant);
+          this.elements.$table.append(newRow);
+          this.elements.$noVariantsMsg.hide();
+        },
+
+        initEditDeleteButtons() {
+          // Using event delegation for edit and delete buttons
+          this.elements.$table.on("click", ".btn-edit-variant", async (e) => {
+            const $row = $(e.currentTarget).closest("tr");
+            const $inputs = $row.find(".edit-input");
+            const variantId = $row.data("variant-id");
+
+            const data = {
+              _id: variantId,
+              size: $row.find('[data-field="size"] input').val().trim(),
+              color: $row.find('[data-field="color"] input').val().trim(),
+              stockQuantity: parseInt(
+                $row.find('[data-field="stockQuantity"] input').val()
+              ),
+              productPrice: parseFloat(
+                $row.find('[data-field="productPrice"] input').val()
+              ),
+              salePrice:
+                parseFloat($row.find('[data-field="salePrice"] input').val()) ||
+                null,
+            };
+
+            const error = validateVariantData(data);
+            if (error) {
+              showNotification(error, "error");
+              return;
+            }
+
+            try {
+              await ProductManager.updateVariant(data);
+              $inputs.removeClass("modified");
+            } catch (error) {
+              console.error("Error updating variant:", error);
+            }
+          });
+
+          this.elements.$table.on("click", ".btn-delete-variant", async (e) => {
+            const $button = $(e.currentTarget);
+            const $row = $button.closest("tr");
+            const variantId = $row.data("variant-id");
+
+            if (
+              $button.prop("disabled") ||
+              !confirm("Are you sure you want to delete this variant?")
+            ) {
+              return;
+            }
+
+            $button.prop("disabled", true);
+            try {
+              await axios.post("/admin/product-variant/delete", {
+                id: variantId,
+              });
+              $row.fadeOut(() => {
+                $row.remove();
+                if (this.elements.$table.find("tr").length === 0) {
+                  this.elements.$noVariantsMsg.show();
+                }
+              });
+              showNotification("Variant deleted successfully", "success");
+            } catch (error) {
+              console.error("Error:", error);
+              showNotification("Error deleting variant", "error");
+              $button.prop("disabled", false);
+            }
+          });
+
+          // Add change event listener to inputs
+          this.elements.$table.on("change", ".edit-input", function () {
+            $(this).addClass("modified");
+          });
+        },
+      };
+
+      VariantManager.init();
+    },
+
+    initCarousel() {
+      const elements = {
+        currentImage: document.getElementById("carousel-current-image"),
+        prevBtn: document.getElementById("carousel-prev"),
+        nextBtn: document.getElementById("carousel-next"),
+        currentNumberEl: document.getElementById("carousel-current-number"),
+        imageData: document.querySelectorAll(".carousel-image-data"),
+      };
+
+      if (!elements.currentImage || !elements.imageData.length) return;
+
+      let currentIndex = 0;
+      const maxIndex = elements.imageData.length - 1;
+
+      const updateCarousel = () => {
+        elements.currentImage.style.opacity = "0";
+        setTimeout(() => {
+          elements.currentImage.src =
+            elements.imageData[currentIndex].getAttribute("data-src");
+          if (elements.currentNumberEl) {
+            elements.currentNumberEl.textContent = (
+              currentIndex + 1
+            ).toString();
+          }
+          elements.currentImage.style.opacity = "1";
+        }, 200);
+      };
+
+      if (elements.prevBtn) {
+        elements.prevBtn.addEventListener("click", () => {
+          currentIndex = currentIndex === 0 ? maxIndex : currentIndex - 1;
+          updateCarousel();
         });
-        showNotification("Variant deleted successfully", "success");
-      } catch (error) {
-        console.error("Error:", error);
-        showNotification("Error deleting variant", "error");
-        $(this).prop("disabled", false);
       }
-    });
-  }
 
-  // Helper functions
-  function getFormData($form) {
-    return $form.serializeArray().reduce((obj, item) => {
-      obj[item.name] = item.value.trim();
-      return obj;
-    }, {});
-  }
-
-  function processFormData(data) {
-    return {
-      ...data,
-      size: data.size.toUpperCase(),
-      color: data.color.charAt(0).toUpperCase() + data.color.slice(1).toLowerCase(),
-      stockQuantity: parseInt(data.stockQuantity),
-      productPrice: parseFloat(data.productPrice),
-      salePrice: data.salePrice ? parseFloat(data.salePrice) : null,
-    };
-  function validateVariantData(data) {
-    if (!data.size) return "Size is required";
-    if (!data.color) return "Color is required";
-    if (!data.stockQuantity) return "Stock quantity is required";
-    if (!data.productPrice) return "Price is required";
-
-    if (isNaN(data.stockQuantity) || parseInt(data.stockQuantity) < 0) {
-      return "Stock quantity must be a positive number";
-    }
-
-    if (isNaN(data.productPrice) || parseFloat(data.productPrice) <= 0) {
-      return "Price must be greater than 0";
-    }
-
-    if (data.salePrice) {
-      if (isNaN(data.salePrice) || parseFloat(data.salePrice) <= 0) {
-        return "Sale price must be greater than 0";
+      if (elements.nextBtn) {
+        elements.nextBtn.addEventListener("click", () => {
+          currentIndex = currentIndex === maxIndex ? 0 : currentIndex + 1;
+          updateCarousel();
+        });
       }
-      if (parseFloat(data.salePrice) >= parseFloat(data.productPrice)) {
-        return "Sale price must be less than regular price";
-      }
-    }
 
-    if (!/^[A-Za-z0-9\s-]+$/.test(data.size)) {
-      return "Size contains invalid characters";
-    }
-
-    if (!/^[A-Za-z\s-]+$/.test(data.color)) {
-      return "Color should only contain letters, spaces, and hyphens";
-    }
-
-    return null;
-  }
-
-  // Simple, clean carousel implementation
-  function initCarousel() {
-    // Get elements
-    const currentImage = document.getElementById("carousel-current-image");
-    const prevBtn = document.getElementById("carousel-prev");
-    const nextBtn = document.getElementById("carousel-next");
-    const currentNumberEl = document.getElementById("carousel-current-number");
-    const imageData = document.querySelectorAll(".carousel-image-data");
-
-    // If we don't have the necessary elements, exit
-    if (!currentImage || !imageData.length) return;
-
-    // Set up state
-    let currentIndex = 0;
-    const maxIndex = imageData.length - 1;
-
-    // Function to update the display
-    function updateCarousel() {
-      // Fade out current image
-      currentImage.style.opacity = "0";
-
-      setTimeout(() => {
-        // Update image source
-        const newSrc = imageData[currentIndex].getAttribute("data-src");
-        currentImage.src = newSrc;
-
-        // Update counter if it exists
-        if (currentNumberEl) {
-          currentNumberEl.textContent = (currentIndex + 1).toString();
+      // Keyboard navigation
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft") {
+          currentIndex = currentIndex === 0 ? maxIndex : currentIndex - 1;
+          updateCarousel();
+        } else if (e.key === "ArrowRight") {
+          currentIndex = currentIndex === maxIndex ? 0 : currentIndex + 1;
+          updateCarousel();
         }
-
-        // Fade in new image
-        currentImage.style.opacity = "1";
-      }, 200);
-    }
-
-    // Go to previous image
-    function prevImage() {
-      currentIndex = currentIndex === 0 ? maxIndex : currentIndex - 1;
-      updateCarousel();
-    }
-
-    // Go to next image
-    function nextImage() {
-      currentIndex = currentIndex === maxIndex ? 0 : currentIndex + 1;
-      updateCarousel();
-    }
-
-    // Set up event listeners
-    if (prevBtn) {
-      prevBtn.addEventListener("click", prevImage);
-    }
-
-    if (nextBtn) {
-      nextBtn.addEventListener("click", nextImage);
-    }
-
-    // Keyboard navigation
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "ArrowLeft") {
-        prevImage();
-      } else if (e.key === "ArrowRight") {
-        nextImage();
-      }
-    });
-
-    // Initial state
-    currentImage.style.opacity = "1";
-  }
-
-  // API Helpers
-  async function updateProduct(data) {
-    try {
-      await axios.post("/admin/product/edit", data);
-      showNotification("Product updated successfully", "success");
-    } catch (error) {
-      console.error("Error:", error);
-      showNotification("Error updating product", "error");
-    }
-  }
-
-  async function updateVariant(data) {
-    try {
-      await axios.post("/admin/product-variant/edit", data);
-      showNotification("Variant updated successfully", "success");
-    } catch (error) {
-      console.error("Error:", error);
-      showNotification("Error updating variant", "error");
-    }
-  }
-
-  // Enhanced notification system
-  function showNotification(message, type) {
-    const existingNotification = document.querySelector(
-      ".product-notification"
-    );
-    if (existingNotification) {
-      existingNotification.remove();
-    }
-
-    // Create icon based on type
-    let icon;
-    switch (type) {
-      case "success":
-        icon = "fas fa-check-circle";
-        break;
-      case "error":
-        icon = "fas fa-exclamation-circle";
-        break;
-      case "info":
-        icon = "fas fa-info-circle";
-        break;
-      default:
-        icon = "fas fa-bell";
-    }
-
-    // Create notification
-    const notification = document.createElement("div");
-    notification.className = `product-notification ${type}`;
-    notification.innerHTML = `
-      <div class="product-notification-icon">
-        <i class="${icon}"></i>
-      </div>
-      <div class="product-notification-message">${message}</div>
-      <button class="product-notification-close">
-        <i class="fas fa-times"></i>
-      </button>
-    `;
-
-    // Add to DOM
-    document.body.appendChild(notification);
-
-    // Add show class after a small delay (for animation)
-    setTimeout(() => notification.classList.add("show"), 10);
-
-    // Setup close button
-    const closeBtn = notification.querySelector(".product-notification-close");
-    if (closeBtn) {
-      closeBtn.addEventListener("click", () => {
-        notification.classList.remove("show");
-        setTimeout(() => notification.remove(), 300);
       });
-    }
+    },
+  };
 
-    // Auto-remove after delay
-    setTimeout(() => {
+  // Initialize the product manager
+  ProductManager.init();
+});
+
+// Variant helper functions
+function getFormData($form) {
+  return $form.serializeArray().reduce((obj, item) => {
+    obj[item.name] = item.value.trim();
+    return obj;
+  }, {});
+}
+
+function processFormData(data) {
+  return {
+    ...data,
+    stockQuantity: parseInt(data.stockQuantity),
+    productPrice: parseFloat(data.productPrice),
+    salePrice: data.salePrice ? parseFloat(data.salePrice) : null,
+  };
+}
+
+function validateVariantData(data) {
+  if (!data.size) return "Size is required";
+  if (!data.color) return "Color is required";
+  if (!data.stockQuantity) return "Stock quantity is required";
+  if (!data.productPrice) return "Price is required";
+
+  if (isNaN(data.stockQuantity) || parseInt(data.stockQuantity) < 0) {
+    return "Stock quantity must be a positive number";
+  }
+
+  if (isNaN(data.productPrice) || parseFloat(data.productPrice) <= 0) {
+    return "Price must be greater than 0";
+  }
+
+  if (data.salePrice) {
+    if (isNaN(data.salePrice) || parseFloat(data.salePrice) <= 0) {
+      return "Sale price must be greater than 0";
+    }
+    if (parseFloat(data.salePrice) >= parseFloat(data.productPrice)) {
+      return "Sale price must be less than regular price";
+    }
+  }
+
+  if (!/^[A-Za-z0-9\s-]+$/.test(data.size)) {
+    return "Size contains invalid characters";
+  }
+
+  if (!/^[A-Za-z\s-]+$/.test(data.color)) {
+    return "Color should only contain letters, spaces, and hyphens";
+  }
+
+  return null;
+}
+
+// Helper function to create a new variant row
+function createVariantRow(variant) {
+  return `
+    <tr data-variant-id="${variant._id}">
+      <td class="editable-cell" data-field="size">
+        <input type="text" class="form-control edit-input" value="${
+          variant.size
+        }"/>
+      </td>
+      <td class="editable-cell" data-field="color">
+        <input type="text" class="form-control edit-input" value="${
+          variant.color
+        }"/>
+      </td>
+      <td class="editable-cell" data-field="stockQuantity">
+        <input type="number" class="form-control edit-input" min="0" step="5" value="${
+          variant.stockQuantity
+        }"/>
+      </td>
+      <td class="editable-cell" data-field="productPrice">
+        <input type="number" class="form-control edit-input" min="0" step="5" value="${
+          variant.productPrice
+        }"/>
+      </td>
+      <td class="editable-cell" data-field="salePrice">
+        <input type="number" class="form-control edit-input" min="0" step="5" value="${
+          variant.salePrice || ""
+        }"/>
+      </td>
+      <td class="actions-cell">
+        <button class="btn-edit-variant" title="Edit variant">
+          <i class="fas fa-pencil-alt"></i>
+        </button>
+        <button class="btn-delete-variant" title="Delete variant">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    </tr>
+  `;
+}
+
+// Enhanced notification system
+function showNotification(message, type) {
+  const existingNotification = document.querySelector(".product-notification");
+  if (existingNotification) {
+    existingNotification.remove();
+  }
+
+  // Create icon based on type
+  let icon;
+  switch (type) {
+    case "success":
+      icon = "fas fa-check-circle";
+      break;
+    case "error":
+      icon = "fas fa-exclamation-circle";
+      break;
+    case "info":
+      icon = "fas fa-info-circle";
+      break;
+    default:
+      icon = "fas fa-bell";
+  }
+
+  // Create notification
+  const notification = document.createElement("div");
+  notification.className = `product-notification ${type}`;
+  notification.innerHTML = `
+    <div class="product-notification-icon">
+      <i class="${icon}"></i>
+    </div>
+    <div class="product-notification-message">${message}</div>
+    <button class="product-notification-close">
+      <i class="fas fa-times"></i>
+    </button>
+  `;
+
+  // Add to DOM
+  document.body.appendChild(notification);
+
+  // Add show class after a small delay (for animation)
+  setTimeout(() => notification.classList.add("show"), 10);
+
+  // Setup close button
+  const closeBtn = notification.querySelector(".product-notification-close");
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
       notification.classList.remove("show");
       setTimeout(() => notification.remove(), 300);
-    }, 4000);
+    });
   }
-});
+
+  // Auto-remove after delay
+  setTimeout(() => {
+    notification.classList.remove("show");
+    setTimeout(() => notification.remove(), 300);
+  }, 4000);
+}

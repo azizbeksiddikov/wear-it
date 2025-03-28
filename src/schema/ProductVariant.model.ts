@@ -28,7 +28,7 @@ const productVariantSchema = new Schema(
       required: true,
     },
 
-    salesPrice: {
+    salePrice: {
       type: Number,
     },
   },

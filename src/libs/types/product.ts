@@ -8,7 +8,7 @@ export interface ProductVariant {
   color: string;
   stockQuantity: number;
   productPrice: number;
-  salesPrice?: number;
+  salePrice?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -19,7 +19,7 @@ export interface ProductVariantInput {
   color: string;
   stockQuantity: number;
   productPrice: number;
-  salesPrice?: number;
+  salePrice?: number;
 }
 
 export interface ProductVariantUpdate {
@@ -28,7 +28,7 @@ export interface ProductVariantUpdate {
   color?: string;
   stockQuantity?: number;
   productPrice?: number;
-  salesPrice?: number;
+  salePrice?: number;
 }
 
 export interface Product {

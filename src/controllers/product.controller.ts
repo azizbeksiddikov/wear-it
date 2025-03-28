@@ -132,7 +132,7 @@ productController.deleteChosenProduct = async (
     const productId = shapeIntoMongooseObjectId(req.body.id);
     const result = await productService.deleteChosenProduct(productId);
 
-    res.status(HttpCode.OK).json({ product: result });
+    res.status(HttpCode.OK).json({ data: result });
   } catch (err) {
     console.log("Error, deleteChosenProduct:", err);
     const message =
@@ -173,7 +173,6 @@ productController.updateChosenProductVariant = async (
 ) => {
   try {
     console.log("updateChosenProductVariant");
-
     const data: ProductVariantUpdate = req.body;
     data._id = shapeIntoMongooseObjectId(data._id);
 
