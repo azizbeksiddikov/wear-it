@@ -1,4 +1,64 @@
 $(document).ready(function () {
+  // Prevent non-numeric input for phone
+  $("#memberPhone").on("keypress", function (e) {
+    if (e.key.match(/[^0-9]/)) {
+      e.preventDefault();
+    }
+  });
+
+  // Handle paste event - strip non-numeric
+  $("#memberPhone").on("paste", function (e) {
+    e.preventDefault();
+    let pastedText = (
+      e.originalEvent.clipboardData || window.clipboardData
+    ).getData("text");
+    pastedText = pastedText.replace(/[^0-9]/g, "");
+
+    let value = this.value + pastedText;
+    if (value.length > 11) value = value.substr(0, 11);
+
+    // Format with hyphens
+    if (value.length >= 3 && value.length <= 7) {
+      value = value.slice(0, 3) + "-" + value.slice(3);
+    } else if (value.length > 7) {
+      value =
+        value.slice(0, 3) + "-" + value.slice(3, 7) + "-" + value.slice(7);
+    }
+
+    $(this).val(value);
+  });
+
+  // Handle input formatting
+  $("#memberPhone").on("input", function (e) {
+    let value = $(this)
+      .val()
+      .replace(/[^0-9]/g, "");
+    if (value.length > 11) value = value.substr(0, 11);
+
+    if (value.length >= 3 && value.length <= 7) {
+      value = value.slice(0, 3) + "-" + value.slice(3);
+    } else if (value.length > 7) {
+      value =
+        value.slice(0, 3) + "-" + value.slice(3, 7) + "-" + value.slice(7);
+    }
+
+    $(this).val(value);
+  });
+
+  // Password visibility toggle
+  $(".toggle-password").click(function () {
+    const inputField = $(this).siblings("input");
+    const type = inputField.attr("type");
+
+    if (type === "password") {
+      $(this).removeClass("fa-eye").addClass("fa-eye-slash");
+      inputField.attr("type", "text");
+    } else {
+      $(this).removeClass("fa-eye-slash").addClass("fa-eye");
+      inputField.attr("type", "password");
+    }
+  });
+
   $("#signupForm").on("submit", function (e) {
     e.preventDefault();
 

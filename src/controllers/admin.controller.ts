@@ -1,16 +1,14 @@
 import { T } from "../libs/types/common";
-import e, { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import MemberService from "../models/Member.service";
 import {
   AdminRequest,
   LoginInput,
   Member,
   MemberInput,
-  MemberInquiry,
 } from "../libs/types/member";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import { MemberType } from "../libs/enums/member.enum";
-import { Dashboard } from "../libs/types/dashboard";
 
 const adminController: T = {},
   memberService = new MemberService();
@@ -40,15 +38,10 @@ adminController.processSignup = async (req: AdminRequest, res: Response) => {
   try {
     console.log("processSignup");
 
-    console.log("req.body:", req.body);
     const newMember: MemberInput = req.body;
     newMember.memberType = MemberType.ADMIN;
 
-    console.log("newMember:", newMember);
-
     const result = await memberService.processSignup(newMember);
-
-    console.log("result:", result);
 
     req.session.member = result;
 

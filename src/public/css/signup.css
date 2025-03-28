@@ -54,6 +54,28 @@
   box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25);
 }
 
+.signup .form-control::placeholder {
+  color: #999;
+  opacity: 0.4;
+}
+
+.signup .password-container {
+  position: relative;
+}
+
+.signup .password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #666;
+}
+
+.signup .password-toggle:hover {
+  color: #e74c3c;
+}
+
 .signup .signup-button {
   width: 100%;
   text-align: center;
@@ -178,6 +200,25 @@
   transform: translateY(-50%);
   font-size: 1.2em;
   color: green;
+}
+
+.signup .password-field {
+  position: relative;
+}
+
+.signup .toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #666;
+  z-index: 10;
+  padding: 5px;
+}
+
+.signup .toggle-password:hover {
+  color: #e74c3c;
 }
 
 /* Responsive Adjustments */
