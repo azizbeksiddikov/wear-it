@@ -40,9 +40,15 @@ adminController.processSignup = async (req: AdminRequest, res: Response) => {
   try {
     console.log("processSignup");
 
+    console.log("req.body:", req.body);
     const newMember: MemberInput = req.body;
     newMember.memberType = MemberType.ADMIN;
+
+    console.log("newMember:", newMember);
+
     const result = await memberService.processSignup(newMember);
+
+    console.log("result:", result);
 
     req.session.member = result;
 
