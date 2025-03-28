@@ -59,6 +59,11 @@
   margin-bottom: 1rem;
 }
 
+.login .form-control::placeholder {
+  color: #999;
+  opacity: 0.4;
+}
+
 .login .login-button {
   width: 100%;
   text-align: center;

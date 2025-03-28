@@ -1,4 +1,16 @@
 $(document).ready(function () {
+  // Add password length validation
+  $("#memberPassword").on("input", function () {
+    const password = $(this).val();
+    const helper = $(this).closest(".label").find(".password-helper");
+
+    if (password.length >= 8) {
+      helper.css("color", "#2ecc71"); // Green color
+    } else {
+      helper.css("color", "#e74c3c"); // Red color
+    }
+  });
+
   // Prevent non-numeric input for phone
   $("#memberPhone").on("keypress", function (e) {
     if (e.key.match(/[^0-9]/)) {
@@ -56,6 +68,24 @@ $(document).ready(function () {
     } else {
       $(this).removeClass("fa-eye-slash").addClass("fa-eye");
       inputField.attr("type", "password");
+    }
+  });
+
+  // Add password matching validation
+  $("#memberPasswordConfirm").on("input", function () {
+    const password = $("#memberPassword").val();
+    const confirmPassword = $(this).val();
+    const smallElement = $("<small>").addClass("password-helper");
+
+    // Remove existing helper text if any
+    $(this).closest(".label").find(".password-helper").remove();
+
+    if (confirmPassword && confirmPassword !== password) {
+      smallElement.text("Passwords do not match!").css("color", "#e74c3c");
+      $(this).closest(".label").append(smallElement);
+    } else if (confirmPassword && confirmPassword === password) {
+      smallElement.text("Passwords match!").css("color", "#2ecc71");
+      $(this).closest(".label").append(smallElement);
     }
   });
 
