@@ -4,6 +4,7 @@ import MemberService from "../models/Member.service";
 import {
   AdminRequest,
   LoginInput,
+  Member,
   MemberInput,
   MemberInquiry,
 } from "../libs/types/member";
@@ -162,9 +163,9 @@ adminController.getChosenUser = async (req: AdminRequest, res: Response) => {
     console.log("getChosenUser");
 
     const id = req.params.id;
-    const result = await memberService.getChosenUser(id);
+    const result: Member = await memberService.getChosenUser(id);
 
-    res.status(HttpCode.OK).json({ data: result });
+    res.render("user", { user: result });
   } catch (err) {
     console.log("Error, getChosenUser:", err);
     if (err instanceof Errors) res.status(err.code).json(err);

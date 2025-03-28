@@ -31,7 +31,7 @@ routerAdmin.get(
 );
 
 routerAdmin.get(
-  "/user/:id",
+  "/users/:id",
   adminController.verifyAdmin,
   adminController.getChosenUser
 ); // + orders
