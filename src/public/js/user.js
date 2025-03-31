@@ -127,7 +127,7 @@ $(document).ready(function () {
         `Member ${newStatus.toLowerCase()} successfully`,
         "success"
       );
-      setTimeout(() => location.reload(), 1500);
+      setTimeout(() => location.reload(), 500);
     } catch (error) {
       console.error("Error:", error);
       showNotification(

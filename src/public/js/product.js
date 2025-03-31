@@ -24,8 +24,6 @@ document.addEventListener("DOMContentLoaded", function () {
     async updateVariant(data) {
       try {
         await axios.post("/admin/product-variant/edit", data);
-        // 1 second to see the console.log
-        await new Promise((r) => setTimeout(r, 1000));
         showNotification("Variant updated successfully", "success");
       } catch (error) {
         console.error("Error:", error);
@@ -104,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function () {
             id: ProductManager.getProductId(),
           });
           showNotification("Product deleted successfully", "success");
-          setTimeout(() => (window.location.href = "/admin/product/all"), 1500);
+          setTimeout(() => (window.location.href = "/admin/product/all"), 500);
         } catch (error) {
           console.error("Error:", error);
           showNotification("Error deleting product", "error");
@@ -290,7 +288,7 @@ document.addEventListener("DOMContentLoaded", function () {
             ).toString();
           }
           elements.currentImage.style.opacity = "1";
-        }, 200);
+        }, 100);
       };
 
       if (elements.prevBtn) {
@@ -465,7 +463,6 @@ function showNotification(message, type) {
       notification.classList.remove("show");
       setTimeout(() => notification.remove(), 300);
     });
-  }
 
   // Auto-remove after delay
   setTimeout(() => {
