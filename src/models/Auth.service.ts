@@ -17,7 +17,7 @@ class AuthService {
       jwt.sign(
         payload,
         this.secretToken,
-        { expiresIn: duration },
+        { expiresIn: AUTH_TIMER * 3600 },
         (err, token) => {
           if (err)
             reject(
