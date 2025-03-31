@@ -33,7 +33,7 @@
           <div class="carousel-main">
             <img
               id="carousel-current-image"
-              src="<%=DOMAIN_NAME%>/<%= product.productImages[0] %>"
+              src="<%= product.productImages[0] %>"
               alt="<%= product.productName %>"
             />
 
@@ -64,7 +64,7 @@
             <div
               class="carousel-image-data"
               data-index="<%= index %>"
-              data-src="<%=DOMAIN_NAME%>/<%= image %>"
+              data-src="<%= image %>"
             ></div>
             <% }); %>
           </div>

@@ -13,6 +13,7 @@ import Errors from "../libs/Errors";
 import { HttpCode } from "../libs/Errors";
 import { Message } from "../libs/Errors";
 import { DOMAIN_NAME, shapeIntoMongooseObjectId } from "../libs/config";
+import { uploadFileToSupabase } from "../libs/utils/uploader";
 
 const productController: T = {},
   productService = new ProductService();
@@ -49,10 +50,19 @@ productController.createNewProduct = async (
     if (!req.files?.length) {
       throw new Errors(HttpCode.INTERNAL_SERVER_ERROR, Message.CREATE_FAILED);
     }
-    const data: ProductInput = req.body;
-    data.productImages = req.files.map((ele) => {
-      return ele.path.replace(/\\/g, "");
-    });
+
+    // Upload all files in parallel
+    const uploadedImageUrls = await Promise.all(
+      req.files.map((file) => uploadFileToSupabase(file))
+    );
+
+    // Prepare product data
+    const data: ProductInput = {
+      ...req.body,
+      productImages: uploadedImageUrls,
+    };
+
+    console.log("uploadedImageUrls", uploadedImageUrls);
 
     const result = await productService.createNewProduct(data);
 
@@ -103,12 +113,6 @@ productController.updateChosenProduct = async (
     console.log("updateChosenProduct");
 
     const data: ProductUpdateInput = req.body;
-
-    if (req.files?.length) {
-      data.productImages = req.files.map((ele) => {
-        return ele.path.replace(/\\/g, "");
-      });
-    }
 
     const result = await productService.updateChosenProduct(req.body);
 

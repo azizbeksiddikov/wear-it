@@ -17,7 +17,6 @@ mongoose.Schema.Types.String.set("trim", true);
 (async function startServer() {
   try {
     await mongoose.connect(MONGO_URL as string, {});
-
     console.log("MongoDB connected successfully");
 
     app.listen(PORT, () => {

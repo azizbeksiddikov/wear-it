@@ -2,7 +2,7 @@ import express from "express";
 import router from "./router";
 import adminController from "./controllers/admin.controller";
 import productController from "./controllers/product.controller";
-import makeUploader from "./libs/utils/uploader";
+import { memoryUploader } from "./libs/utils/uploader";
 
 const routerAdmin = express.Router();
 
@@ -15,7 +15,6 @@ routerAdmin.get("/signup", adminController.getSignup).post(
 
   adminController.processSignup
 );
-//     makeUploader("members").single("memberImage"),
 
 routerAdmin
   .get("/login", adminController.getLogin)
@@ -52,7 +51,7 @@ routerAdmin.get(
 routerAdmin.post(
   "/product/create",
   adminController.verifyAdmin,
-  makeUploader("products").array("productImages", 9),
+  memoryUploader.array("productImages", 9), // Handle up to 9 files in memory
   productController.createNewProduct
 );
 
@@ -65,7 +64,6 @@ routerAdmin.get(
 routerAdmin.post(
   "/product/edit",
   adminController.verifyAdmin,
-  makeUploader("products").array("productImages", 9),
   productController.updateChosenProduct
 );
 

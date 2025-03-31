@@ -37,7 +37,7 @@
                 <div class="product-bio">
                   <a href="/admin/product/<%= product._id %>">
                 
-                    <img src="<%= product.productImages?.[0] ? `${DOMAIN_NAME}/${product.productImages[0]}` : '/img/default-product.webp' %>" 
+                    <img src="<%= product.productImages?.[0] ? `${product.productImages[0]}` : '/img/default-product.png' %>" 
                     alt="<%= product.productName %>"
                     class="product-avatar" />
                     

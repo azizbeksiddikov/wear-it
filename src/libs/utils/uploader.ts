@@ -2,6 +2,9 @@ import path from "path";
 import multer from "multer";
 import { v4 } from "uuid";
 import fs from "fs";
+import { supabase } from "./supabase";
+import { decode } from "base64-arraybuffer";
+import Errors, { HttpCode, Message } from "../Errors";
 
 function getTargetImageStorage(address: any) {
   const targetPath = `./uploads/${address}`;
@@ -27,3 +30,35 @@ const makeUploader = (address: string) => {
 };
 
 export default makeUploader;
+
+export const memoryUploader = multer({
+  storage: multer.memoryStorage(), // Store files in memory as Buffer
+  limits: { fileSize: 10 * 1024 * 1024 }, // Set file size limit (e.g., 10 MB)
+});
+
+export const uploadFileToSupabase = async (file: Express.Multer.File) => {
+  const fileExtension = file.originalname.split(".").pop(); // Get the file extension
+  const randomFileName = `${v4()}.${fileExtension}`; // Generate a random name
+
+  const fileBase64 = decode(file.buffer.toString("base64"));
+
+  const { data, error } = await supabase.storage
+    .from("products")
+    .upload(`products/${randomFileName}`, fileBase64, {
+      contentType: file.mimetype,
+    });
+
+  if (error) {
+    console.error("Error uploading file to Supabase:", error);
+    throw new Errors(
+      HttpCode.INTERNAL_SERVER_ERROR,
+      Message.FILE_UPLOAD_FAILED
+    );
+  }
+
+  const { data: image } = supabase.storage
+    .from("products")
+    .getPublicUrl(data.path);
+
+  return image.publicUrl;
+};
