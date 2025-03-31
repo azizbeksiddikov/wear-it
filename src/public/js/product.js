@@ -23,7 +23,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     async updateVariant(data) {
       try {
-        console.log(data);
         await axios.post("/admin/product-variant/edit", data);
         // 1 second to see the console.log
         await new Promise((r) => setTimeout(r, 1000));
@@ -187,8 +186,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const data = {
               _id: variantId,
-              size: $row.find('[data-field="size"] input').val().trim(),
-              color: $row.find('[data-field="color"] input').val().trim(),
+              size: $row
+                .find('[data-field="size"] input')
+                .val()
+                .trim()
+                .toUpperCase(),
+              color: $row
+                .find('[data-field="color"] input')
+                .val()
+                .trim()
+                .toUpperCase(),
               stockQuantity: parseInt(
                 $row.find('[data-field="stockQuantity"] input').val()
               ),
@@ -208,6 +215,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
             try {
               await ProductManager.updateVariant(data);
+              // Update the input values to show uppercase
+              $row.find('[data-field="size"] input').val(data.size);
+              $row.find('[data-field="color"] input').val(data.color);
               $inputs.removeClass("modified");
             } catch (error) {
               console.error("Error updating variant:", error);
