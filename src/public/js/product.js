@@ -288,7 +288,7 @@ document.addEventListener("DOMContentLoaded", function () {
             ).toString();
           }
           elements.currentImage.style.opacity = "1";
-        }, 100);
+        }, 200);
       };
 
       if (elements.prevBtn) {
@@ -463,6 +463,7 @@ function showNotification(message, type) {
       notification.classList.remove("show");
       setTimeout(() => notification.remove(), 300);
     });
+  }
 
   // Auto-remove after delay
   setTimeout(() => {

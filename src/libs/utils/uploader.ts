@@ -62,3 +62,41 @@ export const uploadFileToSupabase = async (file: Express.Multer.File) => {
 
   return image.publicUrl;
 };
+
+export const deleteFileFromSupabase = async (
+  fileUrl: string
+): Promise<boolean> => {
+  try {
+    // Extract filename from URL
+    const urlParts = fileUrl.split("/");
+    const fileName = urlParts[urlParts.length - 1];
+
+    const { data, error } = await supabase.storage
+      .from("products")
+      .remove([`products/${fileName}`]);
+
+    if (error) {
+      console.error("Error deleting file from Supabase:", error);
+      return false;
+    }
+
+    console.log(`Successfully deleted file: ${fileName}`);
+    return true;
+  } catch (err) {
+    console.error("Failed to delete file from Supabase:", err);
+    return false;
+  }
+};
+
+export const deleteFilesFromSupabase = async (
+  fileUrls: string[]
+): Promise<void> => {
+  if (!fileUrls || fileUrls.length === 0) return;
+
+  try {
+    // Process deletions in parallel
+    await Promise.all(fileUrls.map((url) => deleteFileFromSupabase(url)));
+  } catch (err) {
+    console.error("Error during bulk file deletion:", err);
+  }
+};

@@ -15,6 +15,7 @@ import { T } from "../libs/types/common";
 import { ProductStatus } from "../libs/enums/product.enum";
 import { ObjectId } from "mongoose";
 import ProductVariantModel from "../schema/ProductVariant.model";
+import { deleteFilesFromSupabase } from "../libs/utils/uploader";
 
 class ProductService {
   private readonly productModel;
@@ -80,11 +81,15 @@ class ProductService {
   }
 
   public async deleteChosenProduct(productId: ObjectId): Promise<Product> {
+    const product = await this.productModel.findById(productId).exec();
+    if (!product) {
+      throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+    }
+
     const variantIds = await this.getAllProductVariants(productId);
 
-    console.log("variantIds", variantIds);
-
-    console.log("productId", productId);
+    // Delete product images from Supabase
+    await deleteFilesFromSupabase(product.productImages);
 
     const result = await this.productModel
       .findByIdAndDelete(productId, { new: true })
