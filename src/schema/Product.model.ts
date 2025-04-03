@@ -42,6 +42,11 @@ const productSchema = new Schema(
       type: Boolean,
       default: false,
     },
+
+    productViews: {
+      type: Number,
+      default: 0,
+    },
   },
 
   { timestamps: true }

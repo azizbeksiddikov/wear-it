@@ -17,10 +17,13 @@ import { ObjectId } from "mongoose";
 import ProductVariantModel from "../schema/ProductVariant.model";
 import { deleteFilesFromSupabase } from "../libs/utils/uploader";
 import { Direction } from "../libs/enums/common.enum";
+import { ViewInput } from "../libs/types/view";
+import { ViewGroup } from "../libs/enums/view.enum";
 
 class ProductService {
   private readonly productModel;
   private readonly productVariantModel;
+  private readonly viewService = new ViewService();
 
   constructor() {
     this.productModel = ProductModel;
@@ -77,28 +80,28 @@ class ProductService {
     if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
 
     result.productVariants = await this.getAllProductVariants(productId);
-    // if (memberId) {
-    //   const input: ViewInput = {
-    //     memberId: memberId,
-    //     viewGroup: ViewGroup.PRODUCT,
-    //     viewRefId: productId,
-    //   };
-    //   const existView = await this.viewService.checkViewExistence(input);
 
-    //   // Insert View
-    //   if (!existView) {
-    //     await this.viewService.insertMemberView(input);
+    // View logic
+    if (memberId) {
+      const input: ViewInput = {
+        memberId: memberId,
+        viewGroup: ViewGroup.PRODUCT,
+        viewRefId: productId,
+      };
+      const existView = await this.viewService.checkViewExistence(input);
+      if (!existView) {
+        await this.viewService.insertMemberView(input);
 
-    //     // Increase Counts
-    //     result = await this.productModel
-    //       .findByIdAndUpdate(
-    //         productId,
-    //         { $inc: { productViews: +1 } },
-    //         { new: true }
-    //       )
-    //       .exec();
-    //   }
-    // }
+        await this.productModel
+          .findByIdAndUpdate(
+            productId,
+            { $inc: { productViews: +1 } },
+            { new: true }
+          )
+          .exec();
+        result.productViews += 1;
+      }
+    }
 
     return result as unknown as Product;
   }

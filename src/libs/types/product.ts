@@ -12,6 +12,7 @@ export interface Product {
   isActive: boolean;
   isFeatured: boolean;
   onSale: boolean;
+  productViews: number;
   createdAt: Date;
   updatedAt: Date;
 
