@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import { ProductCategory, ProductGender } from "../libs/enums/product.enum";
 
 const OrderItemSchema = new Schema(
   {
@@ -20,26 +21,53 @@ const OrderItemSchema = new Schema(
       required: true,
     },
 
+    productName: {
+      type: String,
+      required: true,
+    },
+
+    productCategory: {
+      type: String,
+      enum: ProductCategory,
+      required: true,
+    },
+
+    prodcutGender: {
+      type: String,
+      enum: ProductGender,
+      required: true,
+    },
+
+    productImage: {
+      type: String,
+      required: true,
+    },
+
+    productSize: {
+      type: String,
+      required: true,
+    },
+
+    productColor: {
+      type: String,
+      required: true,
+    },
+
     itemQuantity: {
       type: Number,
       required: true,
       min: 1,
     },
 
+    salePrice: {
+      type: Number,
+      min: 0,
+    },
+
     itemUnitPrice: {
       type: Number,
       required: true,
       min: 0,
-    },
-
-    size: {
-      type: String,
-      required: true,
-    },
-
-    color: {
-      type: String,
-      required: true,
     },
   },
   { timestamps: true }

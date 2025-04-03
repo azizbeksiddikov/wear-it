@@ -4,6 +4,7 @@ import MemberService from "../models/Member.service";
 import { Member } from "../libs/types/member";
 import {
   Order,
+  OrderInput,
   OrderInquiry,
   OrderItemInput,
   OrderUpdateInput,
@@ -12,6 +13,7 @@ import { shapeIntoMongooseObjectId } from "../libs/config";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import { OrderStatus } from "../libs/enums/order.enum";
 import { ObjectId } from "mongoose";
+import { T } from "../libs/types/common";
 
 class OrderService {
   private readonly orderModel;
@@ -24,21 +26,22 @@ class OrderService {
     this.memberService = new MemberService();
   }
 
-  public async createOrder(
-    member: Member,
-    input: OrderItemInput[]
-  ): Promise<Order> {
-    const memberId = shapeIntoMongooseObjectId(member._id),
-      amount = input.reduce((acc: number, ele: OrderItemInput) => {
-        return acc + ele.itemUnitPrice * ele.itemQuantity;
-      }, 0),
-      delivery = amount < 100 ? 5 : 0;
+  public async createOrder(member: Member, input: OrderInput): Promise<Order> {
+    const memberId = shapeIntoMongooseObjectId(member._id);
 
-    const newOrder: Order = (await this.orderModel.create({
-      orderTotal: amount + delivery,
-      orderDelivery: delivery,
+    const newOrderInput: T = {
       memberId: memberId,
-    })) as unknown as Order;
+      orderShippingAddress: input.orderShippingAddress,
+      orderSubTotal: input.orderSubTotal,
+      orderShippingCost: input.orderShippingCost,
+      orderTotalAmount: input.orderTotalAmount,
+      orderDate: new Date(),
+      orderStatus: OrderStatus.PROCESSING,
+    };
+
+    const newOrder = (await this.orderModel.create(
+      newOrderInput
+    )) as unknown as Order;
 
     await this.recordOrderItem(newOrder._id, input);
 
@@ -47,18 +50,18 @@ class OrderService {
 
   private async recordOrderItem(
     orderId: ObjectId,
-    input: OrderItemInput[]
+    input: OrderInput
   ): Promise<void> {
-    const promisedList = input.map(async (item: OrderItemInput) => {
+    const promisedList = input.orderItems.map(async (item: OrderItemInput) => {
       item.orderId = orderId;
       item.productId = shapeIntoMongooseObjectId(item.productId);
+      item.variantId = shapeIntoMongooseObjectId(item.variantId);
 
       await this.orderItemModel.create(item);
       return "INSERTED";
     });
 
-    const orderItemState = await Promise.all(promisedList);
-    console.log("orderItemState", orderItemState);
+    await Promise.all(promisedList);
   }
 
   public async getMyOrders(

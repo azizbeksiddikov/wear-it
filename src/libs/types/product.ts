@@ -40,8 +40,8 @@ export interface ProductVariant {
   productId: ObjectId;
   size: string;
   color: string;
-  stockQuantity: number;
   productPrice: number;
+  stockQuantity: number;
   salePrice?: number;
   createdAt: Date;
   updatedAt: Date;

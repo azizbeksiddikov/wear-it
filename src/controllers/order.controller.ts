@@ -1,5 +1,5 @@
 import { T } from "../libs/types/common";
-import e, { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { MemberRequest, VerifiedMemberRequest } from "../libs/types/member";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import OrderService from "../models/Order.service";
@@ -68,7 +68,6 @@ orderController.updateOrder = async (
   }
 };
 
-orderController.getChosenOrder = () => {};
 orderController.deleteOrder = () => {};
 
 export default orderController;

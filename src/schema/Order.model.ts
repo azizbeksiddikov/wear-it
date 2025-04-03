@@ -8,27 +8,33 @@ const orderSchema = new Schema(
       ref: "Member",
       required: true,
     },
+
     orderDate: {
       type: Date,
       required: true,
     },
+
     orderStatus: {
       type: String,
-      required: true,
       enum: OrderStatus,
+      default: OrderStatus.PAUSED,
     },
+
     orderShippingAddress: {
       type: String,
       required: true,
     },
+
     orderSubTotal: {
       type: Number,
       required: true,
     },
+
     orderShippingCost: {
       type: Number,
       required: true,
     },
+
     orderTotalAmount: {
       type: Number,
       required: true,
