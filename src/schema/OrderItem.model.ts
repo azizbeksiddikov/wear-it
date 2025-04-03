@@ -32,7 +32,7 @@ const OrderItemSchema = new Schema(
       required: true,
     },
 
-    prodcutGender: {
+    productGender: {
       type: String,
       enum: ProductGender,
       required: true,

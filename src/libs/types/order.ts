@@ -28,10 +28,10 @@ export interface OrderInput {
 export interface OrderUpdateInput {
   _id: ObjectId;
   orderStatus?: OrderStatus;
-  orderShippingAddress?: string;
-  orderSubTotal?: number;
-  orderShippingCost?: number;
-  orderTotalAmount?: number;
+  // orderShippingAddress?: string;
+  // orderSubTotal?: number;
+  // orderShippingCost?: number;
+  // orderTotalAmount?: number;
 }
 
 export interface OrderItem {
@@ -54,6 +54,7 @@ export interface OrderItem {
 
 export interface OrderItemInput {
   orderId?: ObjectId;
+
   productId: ObjectId;
   variantId: ObjectId;
   productName: string;
@@ -63,12 +64,12 @@ export interface OrderItemInput {
   productSize: string;
   productColor: string;
   itemUnitPrice: number;
-  salePrice?: number;
+  salePrice: number | null;
   itemQuantity: number;
 }
 
 export interface OrderInquiry {
   page: number;
   limit: number;
-  orderStatus: OrderStatus;
+  orderStatus?: OrderStatus;
 }
