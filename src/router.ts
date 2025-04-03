@@ -6,7 +6,6 @@ import reviewController from "./controllers/review.controller";
 const router = express.Router();
 
 /** Member **/
-router.get("/member/admin", memberController.getAdmin);
 router.post("/member/signup", memberController.signup);
 router.post("/member/login", memberController.login);
 router.post(
@@ -44,10 +43,23 @@ router.get(
   memberController.verifyAuth,
   orderController.getMyOrders
 );
+
+router.get(
+  "/order/:id",
+  memberController.verifyAuth,
+  orderController.getChosenOrder
+);
+
 router.post(
-  "/order/update/",
+  "/order/update",
   memberController.verifyAuth,
   orderController.updateOrder
+);
+
+router.post(
+  "/order/delete",
+  memberController.verifyAuth,
+  orderController.deleteOrder
 );
 
 /** Review **/

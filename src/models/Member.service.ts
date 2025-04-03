@@ -76,19 +76,19 @@ class MemberService {
     const result = await this.memberModel
       .findOne({ _id: memberId, memberStatus: MemberStatus.ACTIVE })
       .exec();
+    if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
 
     // TODO: get Member Orders info
 
-    if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
     return result as unknown as Member;
   }
 
   /** ADMIN **/
   public async processSignup(input: MemberInput): Promise<Member> {
-    // const isExist = await this.memberModel
-    //   .findOne({ memberType: MemberType.ADMIN })
-    //   .exec();
-    // if (isExist) throw new Errors(HttpCode.BAD_REQUEST, Message.CREATE_FAILED);
+    const isExist = await this.memberModel
+      .findOne({ memberType: MemberType.ADMIN })
+      .exec();
+    if (isExist) throw new Errors(HttpCode.BAD_REQUEST, Message.CREATE_FAILED);
 
     const salt = await bcryptjs.genSalt();
     input.memberPassword = await bcryptjs.hash(input.memberPassword, salt);

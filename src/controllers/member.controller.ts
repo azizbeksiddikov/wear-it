@@ -120,9 +120,6 @@ memberController.retrieveAuth = async (
 };
 
 /** Member **/
-memberController.getAdmin = async () => {};
-memberController.getMemberDetail = async () => {};
-
 memberController.getMemberDetail = async (
   req: MemberRequest,
   res: Response

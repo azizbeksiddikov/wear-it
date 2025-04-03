@@ -34,6 +34,7 @@ adminController.getSignup = async (req: Request, res: Response) => {
     res.redirect("/admin");
   }
 };
+
 adminController.processSignup = async (req: AdminRequest, res: Response) => {
   try {
     console.log("processSignup");
@@ -46,7 +47,7 @@ adminController.processSignup = async (req: AdminRequest, res: Response) => {
     req.session.member = result;
 
     req.session.save(function () {
-      res.redirect("/admin/product/all");
+      res.redirect("/admin");
     });
   } catch (err) {
     const message =

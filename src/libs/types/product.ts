@@ -68,7 +68,14 @@ export interface ProductUpdateInput {
 }
 
 export interface ProductInquiry {
+  page: number;
+  limit: number;
+  sort: "cretedAt" | "productPrice";
+  order: ["ASC", "DESC"];
   productCategory?: ProductCategory;
   productGender?: ProductGender;
   isActive?: boolean;
+  isFeatured?: boolean;
+  onSale?: boolean;
+  search?: string;
 }

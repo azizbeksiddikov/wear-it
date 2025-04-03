@@ -24,7 +24,7 @@ export interface OrderInput {
   orderTotalAmount?: number;
 }
 
-export interface OrderUpdate {
+export interface OrderUpdateInput {
   _id: ObjectId;
   orderStatus?: OrderStatus;
   orderShippingAddress?: string;
@@ -54,4 +54,10 @@ export interface OrderItemInput {
   itemUnitPrice: number;
   size: string;
   color: string;
+}
+
+export interface OrderInquiry {
+  page: number;
+  limit: number;
+  orderStatus: OrderStatus;
 }
