@@ -1,21 +1,23 @@
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import { shapeIntoMongooseObjectId } from "../libs/config";
-import { T } from "../libs/types/common";
+import { StatisticModifier, T } from "../libs/types/common";
 import { ObjectId } from "mongoose";
 import ReviewModel from "../schema/Review.model";
 import { Review, ReviewInput, ReviewUpdateInput } from "../libs/types/review";
 import OrderService from "./Order.service";
-import ProductService from "./Product.service";
+import ProductModel from "../schema/Product.model";
+import { Product } from "../libs/types/product";
 
 class ReviewService {
   private readonly reviewModel;
+  private readonly productModel;
+
   private readonly orderService;
-  private readonly productService;
 
   constructor() {
     this.reviewModel = ReviewModel;
+    this.productModel = ProductModel;
     this.orderService = new OrderService();
-    this.productService = new ProductService();
   }
 
   public async createReview(
@@ -44,9 +46,7 @@ class ReviewService {
         throw new Errors(HttpCode.BAD_REQUEST, Message.CREATE_FAILED);
 
       // update reviewsCount and reviewsRating
-      const product = await this.productService.getProductWithoutVariants(
-        productId
-      );
+      const product = await this.getProductWithoutVariants(productId);
       const newReviewsCount = product.reviewsCount + 1;
       const newReviewsRating = roundToNearestHalf(
         (product.reviewsRating * product.reviewsCount + rating) /
@@ -54,12 +54,12 @@ class ReviewService {
       );
 
       // Update product statistics
-      await this.productService.productStatsEditor({
+      await this.productStatsEditor({
         _id: productId,
         targetKey: "reviewsCount",
         modifier: 1,
       });
-      await this.productService.productStatsEditor({
+      await this.productStatsEditor({
         _id: productId,
         targetKey: "reviewsRating",
         newValue: newReviewsRating,
@@ -103,9 +103,7 @@ class ReviewService {
 
     if (rating && originalRating !== rating) {
       // Get product to update review statistics
-      const product = await this.productService.getProductWithoutVariants(
-        oldReview.productId
-      );
+      const product = await this.getProductWithoutVariants(oldReview.productId);
 
       // Calculate new average rating
       const totalRatingPoints = product.reviewsRating * product.reviewsCount;
@@ -115,7 +113,7 @@ class ReviewService {
         adjustedRatingPoints / product.reviewsCount
       );
 
-      await this.productService.productStatsEditor({
+      await this.productStatsEditor({
         _id: oldReview.productId,
         targetKey: "reviewsRating",
         newValue: newReviewsRating,
@@ -140,15 +138,13 @@ class ReviewService {
     if (!result) throw new Errors(HttpCode.BAD_REQUEST, Message.DELETE_FAILED);
 
     // Get product to update review stats
-    const product = await this.productService.getProductWithoutVariants(
-      result.productId
-    );
+    const product = await this.getProductWithoutVariants(result.productId);
 
     // Calculate new review statistics after deletion
     const newReviewsCount = product.reviewsCount - 1;
 
     // Update reviewsCount first - decrement by 1
-    await this.productService.productStatsEditor({
+    await this.productStatsEditor({
       _id: result.productId,
       targetKey: "reviewsCount",
       modifier: -1,
@@ -162,13 +158,55 @@ class ReviewService {
     );
 
     // Update product's review rating
-    await this.productService.productStatsEditor({
+    await this.productStatsEditor({
       _id: result.productId,
       targetKey: "reviewsRating",
       newValue: newReviewsRating,
     });
 
     return result as unknown as Review;
+  }
+
+  public async getReviewByProductId(productId: ObjectId): Promise<Review[]> {
+    const match: T = {
+      productId: shapeIntoMongooseObjectId(productId),
+    };
+
+    const result = await this.reviewModel.find(match).lean().exec();
+    if (!result) throw new Errors(HttpCode.BAD_REQUEST, Message.NO_DATA_FOUND);
+
+    return result as unknown as Review[];
+  }
+
+  public async productStatsEditor(input: StatisticModifier): Promise<Product> {
+    const { _id, targetKey, modifier, newValue } = input;
+
+    if (modifier) {
+      return (await this.productModel
+        .findByIdAndUpdate(
+          { _id },
+          { $inc: { [targetKey]: modifier } },
+          { new: true }
+        )
+        .exec()) as unknown as Product;
+    } else if (newValue) {
+      return (await this.productModel
+        .findByIdAndUpdate({ _id }, { [targetKey]: newValue }, { new: true })
+        .exec()) as unknown as Product;
+    }
+    throw new Errors(HttpCode.BAD_REQUEST, Message.UPDATE_FAILED);
+  }
+
+  public async getProductWithoutVariants(
+    productId: ObjectId
+  ): Promise<Product> {
+    let result = (await this.productModel
+      .findOne({ _id: productId, isActive: true })
+      .lean()
+      .exec()) as unknown as Product;
+    if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+
+    return result as unknown as Product;
   }
 }
 

@@ -1,6 +1,7 @@
 import { ObjectId } from "mongoose";
 import { ProductCategory, ProductGender } from "../enums/product.enum";
 import { Direction } from "../enums/common.enum";
+import { Review } from "./review";
 
 export interface Product {
   _id: ObjectId;
@@ -19,6 +20,7 @@ export interface Product {
   reviewsRating: number;
 
   productVariants?: ProductVariant[];
+  productReviews?: Review[];
 }
 
 export interface ProductInput {

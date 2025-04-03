@@ -19,15 +19,19 @@ import { deleteFilesFromSupabase } from "../libs/utils/uploader";
 import { Direction } from "../libs/enums/common.enum";
 import { ViewInput } from "../libs/types/view";
 import { ViewGroup } from "../libs/enums/view.enum";
+import ReviewService from "./Review.service";
 
 class ProductService {
   private readonly productModel;
   private readonly productVariantModel;
-  private readonly viewService = new ViewService();
+  private readonly viewService;
+  private readonly reviewService;
 
   constructor() {
     this.productModel = ProductModel;
     this.productVariantModel = ProductVariantModel;
+    this.reviewService = new ReviewService();
+    this.viewService = new ViewService();
   }
   // USER
   public async getProducts(inquiry: ProductInquiry): Promise<Products> {
@@ -80,6 +84,9 @@ class ProductService {
     if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
 
     result.productVariants = await this.getAllProductVariants(productId);
+    result.productReviews = await this.reviewService.getReviewByProductId(
+      productId
+    );
 
     // View logic
     if (memberId) {
@@ -255,38 +262,6 @@ class ProductService {
         updatedAt: { $gte: thirtyDaysAgo },
       })
       .exec();
-  }
-
-  // Other
-  public async productStatsEditor(input: StatisticModifier): Promise<Product> {
-    const { _id, targetKey, modifier, newValue } = input;
-
-    if (modifier) {
-      return (await this.productModel
-        .findByIdAndUpdate(
-          { _id },
-          { $inc: { [targetKey]: modifier } },
-          { new: true }
-        )
-        .exec()) as unknown as Product;
-    } else if (newValue) {
-      return (await this.productModel
-        .findByIdAndUpdate({ _id }, { [targetKey]: newValue }, { new: true })
-        .exec()) as unknown as Product;
-    }
-    throw new Errors(HttpCode.BAD_REQUEST, Message.UPDATE_FAILED);
-  }
-
-  public async getProductWithoutVariants(
-    productId: ObjectId
-  ): Promise<Product> {
-    let result = (await this.productModel
-      .findOne({ _id: productId, isActive: true })
-      .lean()
-      .exec()) as unknown as Product;
-    if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
-
-    return result as unknown as Product;
   }
 }
 

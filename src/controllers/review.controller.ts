@@ -1,8 +1,7 @@
 import { VerifiedMemberRequest } from "../libs/types/member";
 import { T } from "../libs/types/common";
-import Errors, { HttpCode, Message } from "../libs/Errors";
+import Errors, { HttpCode } from "../libs/Errors";
 import { Response } from "express";
-import { ReviewInput } from "../libs/types/review";
 import ReviewService from "../models/Review.service";
 
 const reviewController: T = {},

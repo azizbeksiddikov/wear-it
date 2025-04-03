@@ -1,6 +1,5 @@
 import orderModel from "../schema/Order.model";
 import orderItemModel from "../schema/OrderItem.model";
-import MemberService from "../models/Member.service";
 import { Member } from "../libs/types/member";
 import {
   Order,
@@ -19,12 +18,10 @@ import { ClientSession } from "mongoose";
 class OrderService {
   private readonly orderModel;
   private readonly orderItemModel;
-  private readonly memberService;
 
   constructor() {
     this.orderModel = orderModel;
     this.orderItemModel = orderItemModel;
-    this.memberService = new MemberService();
   }
 
   public async createOrder(member: Member, input: OrderInput): Promise<Order> {
