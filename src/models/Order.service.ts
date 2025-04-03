@@ -180,6 +180,30 @@ class OrderService {
       })
       .exec();
   }
+
+  // For other Services
+  public async validateOrder(
+    memberId: ObjectId,
+    orderId: ObjectId,
+    productId: ObjectId
+  ): Promise<boolean> {
+    const match: T = {
+      _id: orderId,
+      memberId: memberId,
+      orderStatus: OrderStatus.FINISHED,
+    };
+    const orderExists = await this.orderModel.findOne(match).exec();
+    if (!orderExists) return false;
+
+    const productExist = await this.orderItemModel.findOne({
+      orderId: orderId,
+      productId: productId,
+    });
+
+    if (!productExist) return false;
+
+    return true;
+  }
 }
 
 export default OrderService;

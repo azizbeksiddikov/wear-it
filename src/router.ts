@@ -57,7 +57,20 @@ router.post(
 );
 
 /** Review **/
-router.post("/review/create", reviewController.createReview);
-router.post("/review/update", reviewController.updateReview);
+router.post(
+  "/review/create",
+  memberController.verifyAuth,
+  reviewController.createReview
+);
+router.post(
+  "/review/update",
+  memberController.verifyAuth,
+  reviewController.updateReview
+);
+router.post(
+  "/review/delete",
+  memberController.verifyAuth,
+  reviewController.deleteReview
+);
 
 export default router;

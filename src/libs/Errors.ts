@@ -23,6 +23,7 @@ export enum Message {
   NOT_AUTHENTICATED = "You are not authenticated. Please, login first!",
   TOKEN_CREATION_FAILED = "Token creation error!",
   FILE_UPLOAD_FAILED = "File upload failed!",
+  RATING_OUT_OF_RANGE = "Rating is out of range!",
 }
 
 class Errors extends Error {
