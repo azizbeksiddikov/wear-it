@@ -12,7 +12,7 @@ import {
 } from "../libs/types/product";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import { shapeIntoMongooseObjectId } from "../libs/config";
-import { StatisticModifier, T } from "../libs/types/common";
+import { T } from "../libs/types/common";
 import { ObjectId } from "mongoose";
 import ProductVariantModel from "../schema/ProductVariant.model";
 import { deleteFilesFromSupabase } from "../libs/utils/uploader";

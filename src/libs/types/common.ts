@@ -4,9 +4,14 @@ export interface T {
   [key: string]: any;
 }
 
-export interface StatisticModifier {
+export interface StatisticModifierRelative {
   _id: ObjectId;
   targetKey: string;
-  modifier?: number;
-  newValue?: number;
+  modifier: number;
+}
+
+export interface StatisticModifierAbsolute {
+  _id: ObjectId;
+  targetKey: string;
+  newValue: number;
 }

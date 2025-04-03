@@ -1,6 +1,10 @@
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import { shapeIntoMongooseObjectId } from "../libs/config";
-import { StatisticModifier, T } from "../libs/types/common";
+import {
+  StatisticModifierAbsolute,
+  StatisticModifierRelative,
+  T,
+} from "../libs/types/common";
 import { ObjectId } from "mongoose";
 import ReviewModel from "../schema/Review.model";
 import { Review, ReviewInput, ReviewUpdateInput } from "../libs/types/review";
@@ -54,12 +58,12 @@ class ReviewService {
       );
 
       // Update product statistics
-      await this.productStatsEditor({
+      await this.productStatsIncrement({
         _id: productId,
         targetKey: "reviewsCount",
         modifier: 1,
       });
-      await this.productStatsEditor({
+      await this.productStatsUpdate({
         _id: productId,
         targetKey: "reviewsRating",
         newValue: newReviewsRating,
@@ -113,7 +117,7 @@ class ReviewService {
         adjustedRatingPoints / product.reviewsCount
       );
 
-      await this.productStatsEditor({
+      await this.productStatsUpdate({
         _id: oldReview.productId,
         targetKey: "reviewsRating",
         newValue: newReviewsRating,
@@ -144,7 +148,7 @@ class ReviewService {
     const newReviewsCount = product.reviewsCount - 1;
 
     // Update reviewsCount first - decrement by 1
-    await this.productStatsEditor({
+    await this.productStatsIncrement({
       _id: result.productId,
       targetKey: "reviewsCount",
       modifier: -1,
@@ -158,7 +162,7 @@ class ReviewService {
     );
 
     // Update product's review rating
-    await this.productStatsEditor({
+    await this.productStatsUpdate({
       _id: result.productId,
       targetKey: "reviewsRating",
       newValue: newReviewsRating,
@@ -178,23 +182,28 @@ class ReviewService {
     return result as unknown as Review[];
   }
 
-  public async productStatsEditor(input: StatisticModifier): Promise<Product> {
-    const { _id, targetKey, modifier, newValue } = input;
+  public async productStatsIncrement(
+    input: StatisticModifierRelative
+  ): Promise<Product> {
+    const { _id, targetKey, modifier } = input;
 
-    if (modifier) {
-      return (await this.productModel
-        .findByIdAndUpdate(
-          { _id },
-          { $inc: { [targetKey]: modifier } },
-          { new: true }
-        )
-        .exec()) as unknown as Product;
-    } else if (newValue) {
-      return (await this.productModel
-        .findByIdAndUpdate({ _id }, { [targetKey]: newValue }, { new: true })
-        .exec()) as unknown as Product;
-    }
-    throw new Errors(HttpCode.BAD_REQUEST, Message.UPDATE_FAILED);
+    return (await this.productModel
+      .findByIdAndUpdate(
+        { _id },
+        { $inc: { [targetKey]: modifier } },
+        { new: true }
+      )
+      .exec()) as unknown as Product;
+  }
+
+  public async productStatsUpdate(
+    input: StatisticModifierAbsolute
+  ): Promise<Product> {
+    const { _id, targetKey, newValue } = input;
+
+    return (await this.productModel
+      .findByIdAndUpdate({ _id }, { [targetKey]: newValue }, { new: true })
+      .exec()) as unknown as Product;
   }
 
   public async getProductWithoutVariants(
