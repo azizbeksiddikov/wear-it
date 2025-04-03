@@ -1,6 +1,6 @@
 import { T } from "../libs/types/common";
 import e, { NextFunction, Request, Response } from "express";
-import { MemberRequest } from "../libs/types/member";
+import { MemberRequest, VerifiedMemberRequest } from "../libs/types/member";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import OrderService from "../models/Order.service";
 import { Order, OrderInquiry, OrderUpdateInput } from "../libs/types/order";
@@ -9,7 +9,10 @@ import { OrderStatus } from "../libs/enums/order.enum";
 const orderController: T = {},
   orderService = new OrderService();
 
-orderController.createOrder = async (req: MemberRequest, res: Response) => {
+orderController.createOrder = async (
+  req: VerifiedMemberRequest,
+  res: Response
+) => {
   try {
     console.log("createOrder");
 
@@ -24,7 +27,10 @@ orderController.createOrder = async (req: MemberRequest, res: Response) => {
   }
 };
 
-orderController.getMyOrders = async (req: MemberRequest, res: Response) => {
+orderController.getMyOrders = async (
+  req: VerifiedMemberRequest,
+  res: Response
+) => {
   try {
     console.log("getMyOrders");
 
@@ -44,7 +50,10 @@ orderController.getMyOrders = async (req: MemberRequest, res: Response) => {
   }
 };
 
-orderController.updateOrder = async (req: MemberRequest, res: Response) => {
+orderController.updateOrder = async (
+  req: VerifiedMemberRequest,
+  res: Response
+) => {
   try {
     console.log("updateOrder");
 

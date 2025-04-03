@@ -8,14 +8,15 @@ import {
   ProductVariantInput,
   ProductVariant,
   ProductVariantUpdate,
+  Products,
 } from "../libs/types/product";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import { shapeIntoMongooseObjectId } from "../libs/config";
 import { T } from "../libs/types/common";
-import { ProductStatus } from "../libs/enums/product.enum";
 import { ObjectId } from "mongoose";
 import ProductVariantModel from "../schema/ProductVariant.model";
 import { deleteFilesFromSupabase } from "../libs/utils/uploader";
+import { Direction } from "../libs/enums/common.enum";
 
 class ProductService {
   private readonly productModel;
@@ -26,13 +27,86 @@ class ProductService {
     this.productVariantModel = ProductVariantModel;
   }
   // USER
+  public async getProducts(inquiry: ProductInquiry): Promise<Products> {
+    const match: T = { isActive: true };
+    if (inquiry.productCategory)
+      match.productCategory = inquiry.productCategory;
+    if (inquiry.productGender) match.productGender = inquiry.productGender;
+    if (inquiry.isFeatured) match.isFeatured = inquiry.isFeatured;
+    if (inquiry.onSale) match.onSale = inquiry.onSale;
+    if (inquiry.search)
+      match.productName = { $regex: new RegExp(inquiry.search, "i") };
 
+    const sort: T = {
+      createdAt: inquiry.direction
+        ? Direction[inquiry.direction]
+        : Direction.ASC,
+    };
+
+    const result = await this.productModel
+      .aggregate([
+        { $match: match },
+        { $sort: sort },
+        {
+          $facet: {
+            products: [
+              { $skip: (inquiry.page * 1 - 1) * inquiry.limit },
+              { $limit: inquiry.limit * 1 },
+            ],
+            totalCount: [{ $count: "total" }],
+          },
+        },
+      ])
+      .exec();
+    if (!result.length)
+      throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+
+    return result[0] as unknown as Products;
+  }
+
+  public async getProduct(
+    memberId: ObjectId | null,
+    id: String
+  ): Promise<Product> {
+    const productId = shapeIntoMongooseObjectId(id);
+
+    let result = (await this.productModel
+      .findOne({ _id: productId, isActive: true })
+      .lean()
+      .exec()) as unknown as Product;
+    if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+
+    result.productVariants = await this.getAllProductVariants(productId);
+    // if (memberId) {
+    //   const input: ViewInput = {
+    //     memberId: memberId,
+    //     viewGroup: ViewGroup.PRODUCT,
+    //     viewRefId: productId,
+    //   };
+    //   const existView = await this.viewService.checkViewExistence(input);
+
+    //   // Insert View
+    //   if (!existView) {
+    //     await this.viewService.insertMemberView(input);
+
+    //     // Increase Counts
+    //     result = await this.productModel
+    //       .findByIdAndUpdate(
+    //         productId,
+    //         { $inc: { productViews: +1 } },
+    //         { new: true }
+    //       )
+    //       .exec();
+    //   }
+    // }
+
+    return result as unknown as Product;
+  }
   // ADMIN
   public async getAllProducts(input: ProductInquiry): Promise<Product[]> {
     const match: T = {};
     if (input.productCategory) match.productCategory = input.productCategory;
     if (input.productGender) match.productGender = input.productGender;
-    if (input.isActive) match.isActive = input.isActive;
 
     const result = await this.productModel.find(match).exec();
     if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
@@ -151,8 +225,8 @@ class ProductService {
   ): Promise<ProductVariant[]> {
     const result = await this.productVariantModel
       .find({ productId: productId })
+      .lean()
       .exec();
-
     return (result || []) as unknown as ProductVariant[];
   }
 

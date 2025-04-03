@@ -62,5 +62,9 @@ export interface AdminRequest extends Request {
 }
 
 export interface MemberRequest extends Request {
+  member: Member | null;
+}
+
+export interface VerifiedMemberRequest extends Request {
   member: Member;
 }

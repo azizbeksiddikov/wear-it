@@ -1,9 +1,42 @@
 import { ObjectId } from "mongoose";
 import { ProductCategory, ProductGender } from "../enums/product.enum";
+import { Direction } from "../enums/common.enum";
+
+export interface Product {
+  _id: ObjectId;
+  productName: string;
+  productCategory: ProductCategory;
+  productGender: ProductGender;
+  productDesc?: string;
+  productImages: string[];
+  isActive: boolean;
+  isFeatured: boolean;
+  onSale: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+
+  productVariants?: ProductVariant[];
+}
+
+export interface ProductInput {
+  productName: string;
+  productCategory: ProductCategory;
+  productGender: ProductGender;
+  productDesc?: string;
+  productImages: string[];
+}
+
+export interface ProductUpdateInput {
+  _id: ObjectId;
+  productDesc?: string;
+  isActive?: boolean;
+  isFeatured?: boolean;
+  onSale?: boolean;
+}
 
 export interface ProductVariant {
   _id: ObjectId;
-  productId: ObjectId; // Product
+  productId: ObjectId;
   size: string;
   color: string;
   stockQuantity: number;
@@ -31,51 +64,22 @@ export interface ProductVariantUpdate {
   salePrice?: number;
 }
 
-export interface Product {
-  _id: ObjectId;
-  productName: string;
-  productCategory: ProductCategory;
-  productGender: ProductGender;
-  productDesc?: string;
-  productImages?: string[];
-  isActive: boolean;
-  isFeatured: boolean;
-  onSale: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-
-  productVariants?: ProductVariant[];
-}
-
-export interface ProductInput {
-  productName: string;
-  productCategory: ProductCategory;
-  productGender: ProductGender;
-  productDesc?: string;
-  productImages?: string[];
-}
-
-export interface ProductUpdateInput {
-  _id: ObjectId;
-  productName?: string;
-  productCategory?: ProductCategory;
-  productGender?: ProductGender;
-  productDesc?: string;
-  productImages?: string[];
-  isActive?: boolean;
-  isFeatured?: boolean;
-  onSale?: boolean;
-}
-
 export interface ProductInquiry {
   page: number;
   limit: number;
-  sort: "cretedAt" | "productPrice";
-  order: ["ASC", "DESC"];
+  direction: Direction;
   productCategory?: ProductCategory;
   productGender?: ProductGender;
-  isActive?: boolean;
   isFeatured?: boolean;
   onSale?: boolean;
   search?: string;
+}
+
+export interface TotalCounter {
+  total?: number;
+}
+
+export interface Products {
+  list: Products[];
+  count: TotalCounter;
 }

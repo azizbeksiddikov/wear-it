@@ -1,12 +1,12 @@
-import { AdminRequest } from "../libs/types/member";
+import { AdminRequest, MemberRequest } from "../libs/types/member";
 import { Request, Response } from "express";
 import { T } from "../libs/types/common";
 import ProductService from "../models/Product.service";
 import {
   Product,
   ProductInput,
+  ProductInquiry,
   ProductUpdateInput,
-  ProductVariantInput,
   ProductVariantUpdate,
 } from "../libs/types/product";
 import Errors from "../libs/Errors";
@@ -14,13 +14,65 @@ import { HttpCode } from "../libs/Errors";
 import { Message } from "../libs/Errors";
 import { DOMAIN_NAME, shapeIntoMongooseObjectId } from "../libs/config";
 import { uploadFileToSupabase } from "../libs/utils/uploader";
+import { Direction } from "../libs/enums/common.enum";
+import { ProductCategory } from "../libs/enums/product.enum";
+import { ProductGender } from "../libs/enums/product.enum";
 
 const productController: T = {},
   productService = new ProductService();
 
 // SPA
-productController.getProducts = async () => {};
-productController.getProduct = async () => {}; // + reviews
+productController.getProducts = async (req: Request, res: Response) => {
+  try {
+    console.log("getProducts");
+
+    const {
+      page,
+      limit,
+      direction,
+      productCategory,
+      productGender,
+      isFeatured,
+      onSale,
+      search,
+    } = req.query;
+    const inquiry: ProductInquiry = {
+      page: Number(page),
+      limit: Number(limit),
+      direction: direction as unknown as Direction,
+    };
+    if (productCategory)
+      inquiry.productCategory = productCategory as ProductCategory;
+    if (productGender) inquiry.productGender = productGender as ProductGender;
+    if (isFeatured) inquiry.isFeatured = Boolean(isFeatured);
+    if (onSale) inquiry.onSale = Boolean(onSale);
+    if (search) inquiry.search = search as string;
+
+    const result = await productService.getProducts(inquiry);
+
+    res.status(HttpCode.OK).json(result);
+  } catch (err) {
+    console.log("Error, getProducts", err);
+    if (err instanceof Errors) res.status(err.code).json(err);
+    else res.status(Errors.standard.code).json(Errors.standard);
+  }
+};
+
+productController.getProduct = async (req: MemberRequest, res: Response) => {
+  try {
+    console.log("getProduct");
+
+    const { id } = req.params,
+      memberId = req.member?._id ?? null,
+      result: Product = await productService.getProduct(memberId, id);
+
+    res.status(HttpCode.OK).json(result);
+  } catch (err) {
+    console.log("Error, getProduct", err);
+    if (err instanceof Errors) res.status(err.code).json(err);
+    else res.status(Errors.standard.code).json(Errors.standard);
+  }
+};
 
 // ADMIN
 productController.getAllProducts = async (req: AdminRequest, res: Response) => {
@@ -156,10 +208,8 @@ productController.createNewProductVariant = async (
     console.log("createNewProductVariant");
 
     const data = req.body;
-    console.log("data", data);
     data.productId = shapeIntoMongooseObjectId(data.productId);
     const result = await productService.createNewProductVariant(data);
-    console.log("result", result);
     res.status(HttpCode.OK).json({ productVariant: result });
   } catch (err) {
     console.log("Error, updateChosenProduct:", err);

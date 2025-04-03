@@ -8,6 +8,7 @@ import {
   Member,
   MemberInput,
   MemberInquiry,
+  VerifiedMemberRequest,
 } from "../libs/types/member";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import { MemberType } from "../libs/enums/member.enum";
@@ -61,7 +62,7 @@ memberController.login = async (req: Request, res: Response) => {
   }
 };
 
-memberController.logout = async (req: MemberRequest, res: Response) => {
+memberController.logout = async (req: VerifiedMemberRequest, res: Response) => {
   try {
     console.log("logout");
 
@@ -109,6 +110,7 @@ memberController.retrieveAuth = async (
     console.log("retrieveAuth");
     const token: string = req.cookies?.accessToken;
     if (token) req.member = await authService.verifyToken(token);
+    else req.member = null;
 
     next();
   } catch (err) {
@@ -121,7 +123,7 @@ memberController.retrieveAuth = async (
 
 /** Member **/
 memberController.getMemberDetail = async (
-  req: MemberRequest,
+  req: VerifiedMemberRequest,
   res: Response
 ) => {
   try {
@@ -136,6 +138,9 @@ memberController.getMemberDetail = async (
   }
 };
 
-memberController.updateMember = async () => {};
+memberController.updateMember = async (
+  req: VerifiedMemberRequest,
+  res: Response
+) => {};
 
 export default memberController;

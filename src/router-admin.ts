@@ -30,7 +30,7 @@ routerAdmin.get(
   "/users/:id",
   adminController.verifyAdmin,
   adminController.getChosenUser
-); // + orders
+);
 
 routerAdmin.post(
   "/user/edit",
