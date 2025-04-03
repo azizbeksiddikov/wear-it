@@ -3,6 +3,7 @@ import memberController from "./controllers/member.controller";
 import productController from "./controllers/product.controller";
 import orderController from "./controllers/order.controller";
 import reviewController from "./controllers/review.controller";
+import { memoryUploader } from "./libs/utils/uploader";
 const router = express.Router();
 
 /** Member **/
@@ -21,8 +22,9 @@ router.get(
 router.post(
   "/member/update",
   memberController.verifyAuth,
+  memoryUploader.single("memberImage"),
   memberController.updateMember
-); //   uploader("members").single("memberImage"),
+);
 
 /** Product **/
 router.get("/product/all", productController.getProducts);

@@ -11,6 +11,7 @@ import {
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import AuthService from "../models/Auth.service";
 import { AUTH_TIMER } from "../libs/config";
+import { uploadFileToSupabase } from "../libs/utils/uploader";
 
 const memberController: T = {},
   memberService = new MemberService(),
@@ -142,7 +143,12 @@ memberController.updateMember = async (
   try {
     console.log("update");
     const input: MemberUpdateInput = req.body;
-    if (req.file) input.memberImage = req.file.path.replace(/\\/g, "/");
+    if (req.file) {
+      input.memberImage = req.file.path.replace(/\\/g, "/");
+      const uploadedImage = await uploadFileToSupabase(req.file);
+      console.log("Uploaded image URL:", uploadedImage);
+    }
+
     const result = await memberService.updateMember(req.member, input);
 
     res.status(HttpCode.OK).json(result);
