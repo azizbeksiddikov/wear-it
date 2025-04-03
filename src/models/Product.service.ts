@@ -12,7 +12,7 @@ import {
 } from "../libs/types/product";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import { shapeIntoMongooseObjectId } from "../libs/config";
-import { T } from "../libs/types/common";
+import { StatisticModifier, T } from "../libs/types/common";
 import { ObjectId } from "mongoose";
 import ProductVariantModel from "../schema/ProductVariant.model";
 import { deleteFilesFromSupabase } from "../libs/utils/uploader";
@@ -255,6 +255,38 @@ class ProductService {
         updatedAt: { $gte: thirtyDaysAgo },
       })
       .exec();
+  }
+
+  // Other
+  public async productStatsEditor(input: StatisticModifier): Promise<Product> {
+    const { _id, targetKey, modifier, newValue } = input;
+
+    if (modifier) {
+      return (await this.productModel
+        .findByIdAndUpdate(
+          { _id },
+          { $inc: { [targetKey]: modifier } },
+          { new: true }
+        )
+        .exec()) as unknown as Product;
+    } else if (newValue) {
+      return (await this.productModel
+        .findByIdAndUpdate({ _id }, { [targetKey]: newValue }, { new: true })
+        .exec()) as unknown as Product;
+    }
+    throw new Errors(HttpCode.BAD_REQUEST, Message.UPDATE_FAILED);
+  }
+
+  public async getProductWithoutVariants(
+    productId: ObjectId
+  ): Promise<Product> {
+    let result = (await this.productModel
+      .findOne({ _id: productId, isActive: true })
+      .lean()
+      .exec()) as unknown as Product;
+    if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+
+    return result as unknown as Product;
   }
 }
 

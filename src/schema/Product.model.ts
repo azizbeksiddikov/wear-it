@@ -47,6 +47,16 @@ const productSchema = new Schema(
       type: Number,
       default: 0,
     },
+
+    reviewsCount: {
+      type: Number,
+      default: 0,
+    },
+
+    reviewsRating: {
+      type: Number,
+      default: 0,
+    },
   },
 
   { timestamps: true }

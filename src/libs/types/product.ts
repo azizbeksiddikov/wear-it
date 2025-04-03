@@ -15,6 +15,8 @@ export interface Product {
   productViews: number;
   createdAt: Date;
   updatedAt: Date;
+  reviewsCount: number;
+  reviewsRating: number;
 
   productVariants?: ProductVariant[];
 }
