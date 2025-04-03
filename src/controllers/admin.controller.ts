@@ -1,6 +1,8 @@
 import { T } from "../libs/types/common";
 import { NextFunction, Request, Response } from "express";
 import MemberService from "../models/Member.service";
+import ProductService from "../models/Product.service";
+import OrderService from "../models/Order.service";
 import {
   AdminRequest,
   LoginInput,
@@ -9,17 +11,31 @@ import {
 } from "../libs/types/member";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import { MemberType } from "../libs/enums/member.enum";
+import { Dashboard } from "../libs/types/dashboard";
 
 const adminController: T = {},
-  memberService = new MemberService();
+  memberService = new MemberService(),
+  productService = new ProductService(),
+  orderService = new OrderService();
 
 /** Home **/
 adminController.goHome = async (req: AdminRequest, res: Response) => {
   console.log("goHome");
-  let dashboard = {};
+  let dashboard: Dashboard | any = {};
 
   if (req.session?.member?.memberType === MemberType.ADMIN) {
-    dashboard = await memberService.getDashboard();
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const [totalMembers, totalProducts, totalOrders] = await Promise.all([
+      memberService.getDashboard(thirtyDaysAgo),
+      productService.getDashboard(thirtyDaysAgo),
+      orderService.getDashboard(thirtyDaysAgo),
+    ]);
+
+    dashboard.totalMembers = totalMembers;
+    dashboard.totalProducts = totalProducts;
+    dashboard.totalOrders = totalOrders;
   }
   res.render("home", { dashboard: dashboard });
 };

@@ -48,8 +48,8 @@ export interface OrderItem {
 
 export interface OrderItemInput {
   orderId: ObjectId;
-  productId: ObjectId;
-  variantId: ObjectId;
+  productId: string;
+  variantId: string;
   itemQuantity: number;
   itemUnitPrice: number;
   size: string;

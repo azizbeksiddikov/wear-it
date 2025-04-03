@@ -134,7 +134,7 @@ $(document).ready(function () {
       contentType: "application/json",
       data: JSON.stringify(formData),
       success: function (response) {
-        window.location.href = "/admin/product/all";
+        window.location.href = "/admin";
       },
       error: function (xhr, status, error) {
         alert(xhr.responseText || "An error occurred during signup");

@@ -1,5 +1,4 @@
 import express from "express";
-import router from "./router";
 import adminController from "./controllers/admin.controller";
 import productController from "./controllers/product.controller";
 import { memoryUploader } from "./libs/utils/uploader";
@@ -10,11 +9,9 @@ const routerAdmin = express.Router();
 routerAdmin.get("/", adminController.goHome);
 
 /** Admin Auth **/
-routerAdmin.get("/signup", adminController.getSignup).post(
-  "/signup",
-
-  adminController.processSignup
-);
+routerAdmin
+  .get("/signup", adminController.getSignup)
+  .post("/signup", adminController.processSignup);
 
 routerAdmin
   .get("/login", adminController.getLogin)
@@ -51,7 +48,7 @@ routerAdmin.get(
 routerAdmin.post(
   "/product/create",
   adminController.verifyAdmin,
-  memoryUploader.array("productImages", 9), // Handle up to 9 files in memory
+  memoryUploader.array("productImages", 9),
   productController.createNewProduct
 );
 

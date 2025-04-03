@@ -4,7 +4,7 @@ import { MemberRequest } from "../libs/types/member";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import OrderService from "../models/Order.service";
 import { Order, OrderInquiry, OrderUpdateInput } from "../libs/types/order";
-import { OrderStatus } from "src/libs/enums/order.enum";
+import { OrderStatus } from "../libs/enums/order.enum";
 
 const orderController: T = {},
   orderService = new OrderService();

@@ -30,7 +30,7 @@ class OrderService {
   ): Promise<Order> {
     const memberId = shapeIntoMongooseObjectId(member._id),
       amount = input.reduce((acc: number, ele: OrderItemInput) => {
-        return acc + ele.itemPrice * ele.itemQuantity;
+        return acc + ele.itemUnitPrice * ele.itemQuantity;
       }, 0),
       delivery = amount < 100 ? 5 : 0;
 
@@ -102,7 +102,7 @@ class OrderService {
     input: OrderUpdateInput
   ): Promise<Order> {
     const memberId = shapeIntoMongooseObjectId(member._id),
-      orderId = shapeIntoMongooseObjectId(input.orderId),
+      orderId = shapeIntoMongooseObjectId(input._id),
       orderStatus = input.orderStatus,
       result = await this.orderModel
         .findOneAndUpdate(
@@ -116,10 +116,20 @@ class OrderService {
 
     // !safe because several orders will cause increase in the memberPoints
     // a need for check of previous status of the order
-    if (orderStatus === OrderStatus.PROCESS) {
-      await this.memberService.addUserPoint(member, 1);
+    if (orderStatus === OrderStatus.PROCESSING) {
+      // await this.memberService.addUserPoint(member, 1);
     }
     return result as unknown as Order;
+  }
+
+  //  Dashboard
+  public async getDashboard(thirtyDaysAgo: Date): Promise<number> {
+    return await this.orderModel
+      .countDocuments({
+        orderStatus: OrderStatus.PROCESSING,
+        updatedAt: { $gte: thirtyDaysAgo },
+      })
+      .exec();
   }
 }
 

@@ -169,6 +169,16 @@ class ProductService {
 
     return result as unknown as ProductVariant;
   }
+
+  //  Dashboard
+  public async getDashboard(thirtyDaysAgo: Date): Promise<number> {
+    return await this.productModel
+      .countDocuments({
+        isActive: true,
+        updatedAt: { $gte: thirtyDaysAgo },
+      })
+      .exec();
+  }
 }
 
 export default ProductService;
