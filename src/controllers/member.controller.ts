@@ -2,16 +2,13 @@ import { T } from "../libs/types/common";
 import e, { NextFunction, Request, Response } from "express";
 import MemberService from "../models/Member.service";
 import {
-  AdminRequest,
   MemberRequest,
   LoginInput,
   Member,
-  MemberInput,
-  MemberInquiry,
   VerifiedMemberRequest,
+  MemberUpdateInput,
 } from "../libs/types/member";
 import Errors, { HttpCode, Message } from "../libs/Errors";
-import { MemberType } from "../libs/enums/member.enum";
 import AuthService from "../models/Auth.service";
 import { AUTH_TIMER } from "../libs/config";
 
@@ -141,6 +138,19 @@ memberController.getMemberDetail = async (
 memberController.updateMember = async (
   req: VerifiedMemberRequest,
   res: Response
-) => {};
+) => {
+  try {
+    console.log("update");
+    const input: MemberUpdateInput = req.body;
+    if (req.file) input.memberImage = req.file.path.replace(/\\/g, "/");
+    const result = await memberService.updateMember(req.member, input);
+
+    res.status(HttpCode.OK).json(result);
+  } catch (err) {
+    console.log("Error, updateMember", err);
+    if (err instanceof Errors) res.status(err.code).json(err);
+    else res.status(Errors.standard.code).json(Errors.standard);
+  }
+};
 
 export default memberController;
