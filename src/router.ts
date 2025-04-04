@@ -22,7 +22,7 @@ router.get(
 router.post(
   "/member/update",
   memberController.verifyAuth,
-  memoryUploader.array("memberImage", 1),
+  memoryUploader.single("memberImage"),
   memberController.updateMember
 );
 

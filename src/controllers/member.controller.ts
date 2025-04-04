@@ -142,12 +142,11 @@ memberController.updateMember = async (
 ) => {
   try {
     console.log("update");
-    console.log("req.file", req.file);
-    console.log("req.body", req.body);
     const input: MemberUpdateInput = req.body;
+
     if (req.file) {
-      input.memberImage = req.file.path.replace(/\\/g, "/");
-      const uploadedImage = await uploadFileToSupabase(req.file);
+      const uploadedImage = await uploadFileToSupabase(req.file, "members");
+      input.memberImage = uploadedImage;
       console.log("Uploaded image URL:", uploadedImage);
     }
 

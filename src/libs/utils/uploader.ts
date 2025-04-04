@@ -36,19 +36,19 @@ export const memoryUploader = multer({
   limits: { fileSize: 10 * 1024 * 1024 },
 });
 
-export const uploadFileToSupabase = async (file: Express.Multer.File) => {
+export const uploadFileToSupabase = async (
+  file: Express.Multer.File,
+  folderName: string = "products"
+) => {
   const fileExtension = file.originalname.split(".").pop();
-  console.log("fileExtension", fileExtension);
 
   const randomFileName = `${v4()}.${fileExtension}`; // Generate a random name
-  console.log("randomFileName", randomFileName);
 
   const fileBase64 = decode(file.buffer.toString("base64"));
-  console.log("fileBase64", fileBase64);
 
   const { data, error } = await supabase.storage
-    .from("products")
-    .upload(`products/${randomFileName}`, fileBase64, {
+    .from(folderName)
+    .upload(`/${randomFileName}`, fileBase64, {
       contentType: file.mimetype,
     });
 
@@ -61,14 +61,15 @@ export const uploadFileToSupabase = async (file: Express.Multer.File) => {
   }
 
   const { data: image } = supabase.storage
-    .from("products")
+    .from(folderName)
     .getPublicUrl(data.path);
 
   return image.publicUrl;
 };
 
 export const deleteFileFromSupabase = async (
-  fileUrl: string
+  fileUrl: string,
+  folderName: string = "products"
 ): Promise<boolean> => {
   try {
     // Extract filename from URL
@@ -76,8 +77,8 @@ export const deleteFileFromSupabase = async (
     const fileName = urlParts[urlParts.length - 1];
 
     const { data, error } = await supabase.storage
-      .from("products")
-      .remove([`products/${fileName}`]);
+      .from(folderName)
+      .remove([`/${fileName}`]);
 
     if (error) {
       console.error("Error deleting file from Supabase:", error);
