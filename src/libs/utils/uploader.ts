@@ -32,15 +32,19 @@ import Errors, { HttpCode, Message } from "../Errors";
 // export default makeUploader;
 
 export const memoryUploader = multer({
-  storage: multer.memoryStorage(), // Store files in memory as Buffer
-  limits: { fileSize: 10 * 1024 * 1024 }, // Set file size limit (e.g., 10 MB)
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 },
 });
 
 export const uploadFileToSupabase = async (file: Express.Multer.File) => {
-  const fileExtension = file.originalname.split(".").pop(); // Get the file extension
+  const fileExtension = file.originalname.split(".").pop();
+  console.log("fileExtension", fileExtension);
+
   const randomFileName = `${v4()}.${fileExtension}`; // Generate a random name
+  console.log("randomFileName", randomFileName);
 
   const fileBase64 = decode(file.buffer.toString("base64"));
+  console.log("fileBase64", fileBase64);
 
   const { data, error } = await supabase.storage
     .from("products")

@@ -93,11 +93,15 @@ class OrderService {
     inquiry: OrderInquiry
   ): Promise<Order[]> {
     const memberId = shapeIntoMongooseObjectId(member._id);
-    const match: T = { memberId: memberId };
-    if (inquiry.orderStatus) {
+    const match: T = {
+      memberId: memberId,
+    };
+
+    if (inquiry?.orderStatus && inquiry.orderStatus !== OrderStatus.DELETED) {
       match.orderStatus = inquiry.orderStatus;
+    } else {
+      match.orderStatus = { $ne: OrderStatus.DELETED };
     }
-    console.log("match", match);
 
     const result = await this.orderModel
       .aggregate([

@@ -80,12 +80,17 @@ class MemberService {
     input: MemberUpdateInput
   ): Promise<Member> {
     const memberId = shapeIntoMongooseObjectId(member._id);
-    const result = await this.memberModel
-      .findOneAndUpdate({ _id: memberId }, input, { new: true })
-      .exec();
-
-    if (!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
-    return result as unknown as Member;
+    try {
+      const result = await this.memberModel
+        .findOneAndUpdate({ _id: memberId }, input, { new: true })
+        .exec();
+      if (!result)
+        throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
+      return result as unknown as Member;
+    } catch (err) {
+      console.log("Error, model:updateMember");
+      throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
+    }
   }
 
   /** ADMIN **/
