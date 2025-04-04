@@ -33,7 +33,7 @@ export interface MemberInput {
 }
 
 export interface MemberUpdateInput {
-  _id: ObjectId;
+  _id?: ObjectId; // required for admin
   memberPhone?: string;
   memberPassword?: string;
   memberEmail?: string;
