@@ -1,6 +1,5 @@
 import { AUTH_TIMER } from "../libs/config";
 import { Member } from "../libs/types/member";
-import * as util from "util";
 import jwt from "jsonwebtoken";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 
@@ -12,12 +11,12 @@ class AuthService {
 
   public async createToken(payload: Member) {
     return new Promise((resolve, reject) => {
-      const duration = `${AUTH_TIMER}h`;
+      const duration = AUTH_TIMER * 3600 * 1000;
 
       jwt.sign(
         payload,
         this.secretToken,
-        { expiresIn: AUTH_TIMER * 3600 },
+        { expiresIn: duration },
         (err, token) => {
           if (err)
             reject(

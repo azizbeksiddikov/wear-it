@@ -1,5 +1,5 @@
 export const MORGAN_FORMAT = `:method :url :response-time [:status] \n`;
-export const AUTH_TIMER = 24;
+export const AUTH_TIMER = 48;
 export const DOMAIN_NAME = "http://localhost:3003";
 import mongoose from "mongoose";
 export const shapeIntoMongooseObjectId = (target: any) => {
