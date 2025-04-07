@@ -1,26 +1,21 @@
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import { shapeIntoMongooseObjectId } from "../libs/config";
-import {
-  StatisticModifierAbsolute,
-  StatisticModifierRelative,
-  T,
-} from "../libs/types/common";
 import { ObjectId } from "mongoose";
+import { T } from "../libs/types/common";
 import ReviewModel from "../schema/Review.model";
 import { Review, ReviewInput, ReviewUpdateInput } from "../libs/types/review";
 import OrderService from "./Order.service";
-import ProductModel from "../schema/Product.model";
+import ProductService from "./Product.service";
 import { Product } from "../libs/types/product";
 
 class ReviewService {
   private readonly reviewModel;
-  private readonly productModel;
-
+  private readonly productService;
   private readonly orderService;
 
   constructor() {
     this.reviewModel = ReviewModel;
-    this.productModel = ProductModel;
+    this.productService = new ProductService();
     this.orderService = new OrderService();
   }
 
@@ -28,20 +23,20 @@ class ReviewService {
     memberId: ObjectId,
     input: ReviewInput
   ): Promise<Review> {
-    const { productId, orderId, rating, comment } = input;
+    const { productId, rating, comment } = input;
     const newReview: T = {
-      productId: shapeIntoMongooseObjectId(productId),
-      orderId: shapeIntoMongooseObjectId(orderId),
       memberId: shapeIntoMongooseObjectId(memberId),
+      productId: shapeIntoMongooseObjectId(productId),
       rating: Number(rating),
     };
     if (comment) newReview.comment = comment;
 
-    const isValid = await this.orderService.validateOrder(
-      memberId,
-      orderId,
+    const product: Product = await this.productService.getPureProduct(
       productId
     );
+    if (!product) throw new Errors(HttpCode.BAD_REQUEST, Message.NO_DATA_FOUND);
+
+    const isValid = await this.orderService.validateOrder(memberId, productId);
     if (!isValid) throw new Errors(HttpCode.BAD_REQUEST, Message.CREATE_FAILED);
 
     try {
@@ -49,21 +44,22 @@ class ReviewService {
       if (!result)
         throw new Errors(HttpCode.BAD_REQUEST, Message.CREATE_FAILED);
 
-      // update reviewsCount and reviewsRating
-      const product = await this.getProductWithoutVariants(productId);
-      const newReviewsCount = product.reviewsCount + 1;
-      const newReviewsRating = roundToNearestHalf(
-        (product.reviewsRating * product.reviewsCount + rating) /
-          newReviewsCount
-      );
+      // update Product.reviewsCount and Product.reviewsRating
+      const prevReviewsCount = Number(product?.reviewsCount ?? 0);
+      const prevReviewsRating = Number(product?.reviewsRating ?? 0);
+      const newReviewsCount = prevReviewsCount + 1;
+      const totalRatingPoints = prevReviewsCount * prevReviewsRating;
+      const newReviewsRating =
+        (totalRatingPoints + Number(rating)) / newReviewsCount;
 
       // Update product statistics
-      await this.productStatsIncrement({
+      await this.productService.productStatsIncrement({
         _id: productId,
         targetKey: "reviewsCount",
         modifier: 1,
       });
-      await this.productStatsUpdate({
+
+      await this.productService.productStatsUpdate({
         _id: productId,
         targetKey: "reviewsRating",
         newValue: newReviewsRating,
@@ -91,9 +87,10 @@ class ReviewService {
     )) as unknown as Review;
     if (!oldReview)
       throw new Errors(HttpCode.BAD_REQUEST, Message.NO_DATA_FOUND);
-    const originalRating = oldReview.rating;
+    const originalRating = Number(oldReview.rating);
 
     const newReview: T = {};
+
     if (rating) newReview.rating = Number(rating);
     if (comment) newReview.comment = comment;
     if (newReview.rating > 5 || newReview.rating < 0)
@@ -107,17 +104,19 @@ class ReviewService {
 
     if (rating && originalRating !== rating) {
       // Get product to update review statistics
-      const product = await this.getProductWithoutVariants(oldReview.productId);
-
-      // Calculate new average rating
-      const totalRatingPoints = product.reviewsRating * product.reviewsCount;
-      const adjustedRatingPoints =
-        totalRatingPoints + (rating - originalRating);
-      const newReviewsRating = roundToNearestHalf(
-        adjustedRatingPoints / product.reviewsCount
+      const product = await this.productService.getPureProduct(
+        oldReview.productId
       );
 
-      await this.productStatsUpdate({
+      // update Product.reviewsCount and Product.reviewsRating
+      const reviewsCount = Number(product?.reviewsCount ?? 0);
+      const prevReviewsRating = Number(product?.reviewsRating ?? 0);
+
+      const totalRatingPoints = reviewsCount * prevReviewsRating;
+      const newReviewsRating =
+        (totalRatingPoints + Number(rating - originalRating)) / reviewsCount;
+
+      await this.productService.productStatsUpdate({
         _id: oldReview.productId,
         targetKey: "reviewsRating",
         newValue: newReviewsRating,
@@ -141,28 +140,24 @@ class ReviewService {
     )) as unknown as Review;
     if (!result) throw new Errors(HttpCode.BAD_REQUEST, Message.DELETE_FAILED);
 
-    // Get product to update review stats
-    const product = await this.getProductWithoutVariants(result.productId);
+    // update Product.reviewsCount and Product.reviewsRating
+    const product = await this.productService.getPureProduct(result.productId);
 
-    // Calculate new review statistics after deletion
-    const newReviewsCount = product.reviewsCount - 1;
+    const prevReviewsCount = Number(product?.reviewsCount ?? 0);
+    const prevReviewsRating = Number(product?.reviewsRating ?? 0);
 
-    // Update reviewsCount first - decrement by 1
-    await this.productStatsIncrement({
+    const newReviewsCount = prevReviewsCount - 1;
+    const totalRatingPoints = prevReviewsCount * prevReviewsRating;
+    const newReviewsRating =
+      (totalRatingPoints - Number(result.rating)) / newReviewsCount;
+
+    await this.productService.productStatsIncrement({
       _id: result.productId,
       targetKey: "reviewsCount",
       modifier: -1,
     });
 
-    // Calculate new rating average
-    const adjustedRatingPoints =
-      product.reviewsRating * product.reviewsCount - result.rating;
-    const newReviewsRating = roundToNearestHalf(
-      adjustedRatingPoints / newReviewsCount
-    );
-
-    // Update product's review rating
-    await this.productStatsUpdate({
+    await this.productService.productStatsUpdate({
       _id: result.productId,
       targetKey: "reviewsRating",
       newValue: newReviewsRating,
@@ -170,57 +165,6 @@ class ReviewService {
 
     return result as unknown as Review;
   }
-
-  public async getReviewByProductId(productId: ObjectId): Promise<Review[]> {
-    const match: T = {
-      productId: shapeIntoMongooseObjectId(productId),
-    };
-
-    const result = await this.reviewModel.find(match).lean().exec();
-    if (!result) throw new Errors(HttpCode.BAD_REQUEST, Message.NO_DATA_FOUND);
-
-    return result as unknown as Review[];
-  }
-
-  public async productStatsIncrement(
-    input: StatisticModifierRelative
-  ): Promise<Product> {
-    const { _id, targetKey, modifier } = input;
-
-    return (await this.productModel
-      .findByIdAndUpdate(
-        { _id },
-        { $inc: { [targetKey]: modifier } },
-        { new: true }
-      )
-      .exec()) as unknown as Product;
-  }
-
-  public async productStatsUpdate(
-    input: StatisticModifierAbsolute
-  ): Promise<Product> {
-    const { _id, targetKey, newValue } = input;
-
-    return (await this.productModel
-      .findByIdAndUpdate({ _id }, { [targetKey]: newValue }, { new: true })
-      .exec()) as unknown as Product;
-  }
-
-  public async getProductWithoutVariants(
-    productId: ObjectId
-  ): Promise<Product> {
-    let result = (await this.productModel
-      .findOne({ _id: productId, isActive: true })
-      .lean()
-      .exec()) as unknown as Product;
-    if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
-
-    return result as unknown as Product;
-  }
 }
 
 export default ReviewService;
-
-function roundToNearestHalf(num: number): number {
-  return Math.round(num * 2) / 2;
-}

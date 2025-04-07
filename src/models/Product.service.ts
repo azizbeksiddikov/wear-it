@@ -12,25 +12,26 @@ import {
 } from "../libs/types/product";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import { shapeIntoMongooseObjectId } from "../libs/config";
-import { T } from "../libs/types/common";
+import {
+  StatisticModifierAbsolute,
+  StatisticModifierRelative,
+  T,
+} from "../libs/types/common";
 import { ObjectId } from "mongoose";
 import ProductVariantModel from "../schema/ProductVariant.model";
 import { deleteFilesFromSupabase } from "../libs/utils/uploader";
 import { Direction } from "../libs/enums/common.enum";
 import { ViewInput } from "../libs/types/view";
 import { ViewGroup } from "../libs/enums/view.enum";
-import ReviewService from "./Review.service";
 
 class ProductService {
   private readonly productModel;
   private readonly productVariantModel;
   private readonly viewService;
-  private readonly reviewService;
 
   constructor() {
     this.productModel = ProductModel;
     this.productVariantModel = ProductVariantModel;
-    this.reviewService = new ReviewService();
     this.viewService = new ViewService();
   }
   // USER
@@ -77,16 +78,32 @@ class ProductService {
   ): Promise<Product> {
     const productId = shapeIntoMongooseObjectId(id);
 
-    let result = (await this.productModel
-      .findOne({ _id: productId, isActive: true })
-      .lean()
-      .exec()) as unknown as Product;
-    if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+    const match: T = { _id: productId, isActive: true };
 
-    result.productVariants = await this.getAllProductVariants(productId);
-    result.productReviews = await this.reviewService.getReviewByProductId(
-      productId
-    );
+    let result = await this.productModel
+      .aggregate([
+        { $match: match },
+        {
+          $lookup: {
+            from: "productVariants",
+            localField: "_id",
+            foreignField: "productId",
+            as: "productVariants",
+          },
+        },
+        {
+          $lookup: {
+            from: "reviews",
+            localField: "_id",
+            foreignField: "productId",
+            as: "productReviews",
+          },
+        },
+        { $limit: 1 },
+      ])
+      .exec();
+
+    if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
 
     // View logic
     if (memberId) {
@@ -106,11 +123,11 @@ class ProductService {
             { new: true }
           )
           .exec();
-        result.productViews += 1;
+        result[0].productViews += 1;
       }
     }
 
-    return result as unknown as Product;
+    return result[0] as unknown as Product;
   }
   // ADMIN
   public async getAllProducts(input: ProductInquiry): Promise<Product[]> {
@@ -262,6 +279,41 @@ class ProductService {
         updatedAt: { $gte: thirtyDaysAgo },
       })
       .exec();
+  }
+
+  // Other Services
+  public async getPureProduct(productId: ObjectId): Promise<Product> {
+    let result = (await this.productModel
+      .findOne({ _id: productId, isActive: true })
+      .lean()
+      .exec()) as unknown as Product;
+    if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+
+    return result as unknown as Product;
+  }
+
+  public async productStatsIncrement(
+    input: StatisticModifierRelative
+  ): Promise<Product> {
+    const { _id, targetKey, modifier } = input;
+
+    return (await this.productModel
+      .findByIdAndUpdate(
+        _id,
+        { $inc: { [targetKey]: modifier } },
+        { new: true }
+      )
+      .exec()) as unknown as Product;
+  }
+
+  public async productStatsUpdate(
+    input: StatisticModifierAbsolute
+  ): Promise<Product> {
+    const { _id, targetKey, newValue } = input;
+
+    return (await this.productModel
+      .findByIdAndUpdate(_id, { [targetKey]: newValue }, { new: true })
+      .exec()) as unknown as Product;
   }
 }
 
