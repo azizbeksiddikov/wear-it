@@ -5,6 +5,7 @@ import {
   Order,
   OrderInput,
   OrderInquiry,
+  OrderItem,
   OrderItemInput,
   OrderUpdateInput,
 } from "../libs/types/order";
@@ -155,6 +156,47 @@ class OrderService {
       .lean()
       .exec();
     if (!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
+
+    // PROCESSING = "PROCESSING"
+    // CANCELLED = "CANCELLED",
+
+    if (input.orderStatus === OrderStatus.PROCESSING) {
+      // Use a single MongoDB command that joins data and performs updates
+      const db = this.orderModel.db.db;
+
+      // Get the order items for this order
+      const orderItems = (await this.orderItemModel
+        .find({ orderId: orderId })
+        .lean()) as OrderItem[];
+
+      // For each item, update the corresponding product variant
+      for (const item of orderItems) {
+        await db
+          .collection("productVariants")
+          .updateOne(
+            { _id: item.variantId },
+            { $inc: { stockQuantity: -(item.itemQuantity || 1) } }
+          );
+      }
+    } else if (input.orderStatus === OrderStatus.CANCELLED) {
+      // Use a single MongoDB command that joins data and performs updates
+      const db = this.orderModel.db.db;
+
+      // Get the order items for this order
+      const orderItems = (await this.orderItemModel
+        .find({ orderId: orderId })
+        .lean()) as OrderItem[];
+
+      // For each item, update the corresponding product variant
+      for (const item of orderItems) {
+        await db
+          .collection("productVariants")
+          .updateOne(
+            { _id: item.variantId },
+            { $inc: { stockQuantity: item.itemQuantity || 1 } }
+          );
+      }
+    }
 
     return result as unknown as Order;
   }

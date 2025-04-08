@@ -23,16 +23,19 @@ import { deleteFilesFromSupabase } from "../libs/utils/uploader";
 import { Direction } from "../libs/enums/common.enum";
 import { ViewInput } from "../libs/types/view";
 import { ViewGroup } from "../libs/enums/view.enum";
+import OrderService from "./Order.service";
 
 class ProductService {
   private readonly productModel;
   private readonly productVariantModel;
   private readonly viewService;
+  private readonly orderService;
 
   constructor() {
     this.productModel = ProductModel;
     this.productVariantModel = ProductVariantModel;
     this.viewService = new ViewService();
+    this.orderService = new OrderService();
   }
   // USER
   public async getProducts(inquiry: ProductInquiry): Promise<Products> {
@@ -60,6 +63,14 @@ class ProductService {
             list: [
               { $skip: (inquiry.page * 1 - 1) * inquiry.limit },
               { $limit: inquiry.limit * 1 },
+              {
+                $lookup: {
+                  from: "productVariants",
+                  localField: "_id",
+                  foreignField: "productId",
+                  as: "productVariants",
+                },
+              },
             ],
             count: [{ $count: "total" }],
           },
@@ -68,6 +79,41 @@ class ProductService {
       .exec();
     if (!result.length)
       throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+
+    // GetProducts: add cheapest productVariant in fetching process'
+    const products = result[0].list as unknown as Product[];
+    products.forEach((product: Product) => {
+      if (!product?.productVariants?.length) return;
+
+      if (product.onSale) {
+        const variantsWithSalePrice = product.productVariants.filter(
+          (variant) =>
+            variant.salePrice !== undefined && variant.salePrice !== null
+        );
+
+        // If we have variants with sale price, find the cheapest one
+        if (variantsWithSalePrice.length > 0) {
+          product.cheapestProductVariant = variantsWithSalePrice.reduce(
+            (prev, curr) => (prev.salePrice! < curr.salePrice! ? prev : curr),
+            variantsWithSalePrice[0]
+          );
+        }
+        // If no variants have sale price (shouldn't happen for onSale products, but as fallback)
+        else {
+          product.cheapestProductVariant = product.productVariants.reduce(
+            (prev, curr) =>
+              prev.productPrice < curr.productPrice ? prev : curr,
+            product.productVariants[0]
+          );
+        }
+      } else {
+        // For regular products, find the cheapest by normal price
+        product.cheapestProductVariant = product.productVariants.reduce(
+          (prev, curr) => (prev.productPrice < curr.productPrice ? prev : curr),
+          product.productVariants[0]
+        );
+      }
+    });
 
     return result[0] as unknown as Products;
   }
@@ -105,6 +151,8 @@ class ProductService {
 
     if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
 
+    const product = result[0] as unknown as Product;
+
     // View logic
     if (memberId) {
       const input: ViewInput = {
@@ -123,11 +171,20 @@ class ProductService {
             { new: true }
           )
           .exec();
-        result[0].productViews += 1;
       }
+
+      if (product.productReviews) {
+        product.memberReview = product.productReviews.find(
+          (review) => review.memberId.toString() === memberId.toString()
+        );
+      }
+      product.isReviewValid = await this.orderService.validateOrder(
+        memberId,
+        productId
+      );
     }
 
-    return result[0] as unknown as Product;
+    return product;
   }
   // ADMIN
   public async getAllProducts(input: ProductInquiry): Promise<Product[]> {

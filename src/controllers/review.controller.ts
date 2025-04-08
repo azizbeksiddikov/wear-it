@@ -48,11 +48,11 @@ reviewController.deleteReview = async (
   res: Response
 ) => {
   try {
-    console.log("deleteReview");
-
     const memberId = req.member._id;
+    const { reviewId } = req.body;
 
-    const result = await reviewService.deleteReview(memberId, req.body);
+    const result = await reviewService.deleteReview(memberId, reviewId);
+
     res.status(HttpCode.OK).json(result);
   } catch (err) {
     console.log("Error, deleteReview", err);

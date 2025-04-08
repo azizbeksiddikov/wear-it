@@ -127,12 +127,11 @@ class ReviewService {
 
   public async deleteReview(
     memberId: ObjectId,
-    input: string
+    reviewId: string
   ): Promise<Review> {
-    const reviewId = shapeIntoMongooseObjectId(input);
     const match: T = {
-      _id: reviewId,
-      memberId: memberId,
+      _id: shapeIntoMongooseObjectId(reviewId),
+      memberId: shapeIntoMongooseObjectId(memberId),
     };
 
     const result = (await this.reviewModel.findOneAndDelete(
@@ -143,13 +142,22 @@ class ReviewService {
     // update Product.reviewsCount and Product.reviewsRating
     const product = await this.productService.getPureProduct(result.productId);
 
-    const prevReviewsCount = Number(product?.reviewsCount ?? 0);
-    const prevReviewsRating = Number(product?.reviewsRating ?? 0);
+    const prevReviewsCount = product?.reviewsCount
+      ? Number(product.reviewsCount)
+      : 0;
+    const prevReviewsRating = product?.reviewsRating
+      ? Number(product.reviewsRating)
+      : 0;
 
     const newReviewsCount = prevReviewsCount - 1;
-    const totalRatingPoints = prevReviewsCount * prevReviewsRating;
-    const newReviewsRating =
-      (totalRatingPoints - Number(result.rating)) / newReviewsCount;
+
+    let newReviewsRating = 0;
+    if (newReviewsCount !== 0) {
+      const totalRatingPoints = prevReviewsCount * prevReviewsRating;
+
+      newReviewsRating =
+        (totalRatingPoints - Number(result.rating)) / newReviewsCount;
+    }
 
     await this.productService.productStatsIncrement({
       _id: result.productId,
