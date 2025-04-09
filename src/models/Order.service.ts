@@ -229,49 +229,19 @@ class OrderService {
     memberId: ObjectId,
     productId: ObjectId
   ): Promise<boolean> {
-    const match: T = {
-      memberId: memberId,
-      orderStatus: { $in: [OrderStatus.FINISHED, OrderStatus.CANCELLED] },
-    };
+    const count = await this.orderItemModel.countDocuments({
+      productId,
+      orderId: {
+        $in: await this.orderModel
+          .find({
+            memberId,
+            orderStatus: { $in: [OrderStatus.FINISHED, OrderStatus.CANCELLED] },
+          })
+          .distinct("_id"),
+      },
+    });
 
-    const memberOrders = await this.orderModel.find(match).exec();
-    if (!memberOrders.length) return false;
-
-    for (const order of memberOrders) {
-      const productExist = await this.orderItemModel.findOne({
-        orderId: order._id,
-        productId: productId,
-      });
-      if (productExist) return true;
-    }
-
-    return false;
-
-    // const result = await this.orderItemModel
-    //   .aggregate([
-    //     {
-    //       $lookup: {
-    //         from: "orders",
-    //         localField: "orderId",
-    //         foreignField: "_id",
-    //         as: "order",
-    //       },
-    //     },
-    //     { $unwind: "$order" },
-    //     {
-    //       $match: {
-    //         productId: productId,
-    //         "order.memberId": memberId,
-    //         "order.orderStatus": {
-    //           $in: [OrderStatus.FINISHED, OrderStatus.CANCELLED],
-    //         },
-    //       },
-    //     },
-    //     { $limit: 1 },
-    //   ])
-    //   .exec();
-
-    // return result.length > 0;
+    return count > 0;
   }
 }
 
