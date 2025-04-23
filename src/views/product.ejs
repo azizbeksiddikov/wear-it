@@ -45,11 +45,9 @@
             <button class="carousel-arrow carousel-next" id="carousel-next">
               <i class="fas fa-angle-right"></i>
             </button>
-            <% } %>
           </div>
 
           <!-- Image counter indicator -->
-          <% if (product.productImages.length > 1) { %>
           <div class="carousel-counter">
             <span id="carousel-current-number">1</span>/<span
               id="carousel-total-number"
@@ -102,7 +100,7 @@
               type="checkbox" id="isFeatured" data-field="isFeatured" <%=
               product.isFeatured ? 'checked' : '' %>>
               <label class="form-check-label" for="isFeatured"
-                >Featured Product</label
+                >On Feature</label
               >
             </div>
 

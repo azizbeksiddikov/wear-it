@@ -276,6 +276,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
       let currentIndex = 0;
       const maxIndex = elements.imageData.length - 1;
+      const preloadedImages = [];
+
+      // Preload all images
+      const preloadImages = () => {
+        elements.imageData.forEach((data, index) => {
+          const img = new Image();
+          img.src = data.getAttribute("data-src");
+          preloadedImages[index] = img;
+        });
+      };
+      preloadImages();
 
       const updateCarousel = () => {
         elements.currentImage.style.opacity = "0";
@@ -288,7 +299,7 @@ document.addEventListener("DOMContentLoaded", function () {
             ).toString();
           }
           elements.currentImage.style.opacity = "1";
-        }, 200);
+        }, 150);
       };
 
       if (elements.prevBtn) {
