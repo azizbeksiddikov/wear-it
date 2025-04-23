@@ -447,22 +447,6 @@
   font-weight: 500;
 }
 
-/* Static styling for different status options */
-.users .users-status-select option[value="ACTIVE"] {
-  background-color: #d4edda;
-  color: #155724;
-}
-
-.users .users-status-select option[value="BLOCKED"] {
-  background-color: #f8d7da;
-  color: #721c24;
-}
-
-.users .users-status-select option[value="DELETED"] {
-  background-color: #e2e3e5;
-  color: #383d41;
-}
-
 /* Dynamic styling based on data-status */
 .users .users-status-select[data-status="ACTIVE"] {
   border-color: #28a745;

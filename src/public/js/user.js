@@ -1,189 +1,60 @@
 $(document).ready(function () {
   const $form = $("#memberForm");
-  const $blockBtn = $("#blockBtn");
-  const $unblockBtn = $("#unblockBtn");
-  const memberId = $form.find('input[name="_id"]').val();
-  const $pointsInput = $("#memberPoints");
-  let originalPoints = $pointsInput.val();
+  const $submitBtn = $form.find('button[type="submit"]');
 
   // Form submission
   $form.on("submit", async function (e) {
     e.preventDefault();
-    const $submitBtn = $(this).find('button[type="submit"]');
-    if ($submitBtn.prop("disabled")) return;
 
+    // Get form data
     const formData = {
-      _id: memberId,
-      memberFullName: $('input[name="memberFullName"]').val().trim(),
-      memberEmail: $('input[name="memberEmail"]').val().trim(),
-      memberPhone: $('input[name="memberPhone"]').val().trim(),
-      memberAddress: $('input[name="memberAddress"]').val().trim(),
-      memberDesc: $('textarea[name="memberDesc"]').val().trim(),
-      memberPoints: parseInt($("#memberPoints").val()),
+      _id: $('input[name="_id"]').val(),
+      memberStatus: $(".member-status").val(),
+      memberPoints: parseInt($("#memberPoints").val()) || 0,
+      memberFullName: $('input[name="memberFullName"]').val() || "",
+      memberEmail: $('input[name="memberEmail"]').val() || "",
+      memberPhone: $('input[name="memberPhone"]').val() || "",
+      memberAddress: $('input[name="memberAddress"]').val() || "",
+      memberDesc: $('textarea[name="memberDesc"]').val() || "",
     };
 
-    // Remove empty fields
-    Object.keys(formData).forEach(
-      (key) => !formData[key] && key !== "_id" && delete formData[key]
-    );
+    const phoneNum = formData.memberPhone.replace(/[^0-9]/g, "");
+    if (!phoneNum || phoneNum.length < 10) {
+      alert("Please enter a valid phone number (010-1234-5678)");
+      return;
+    }
 
-    $submitBtn.prop("disabled", true);
+    // Show loading state
+    $submitBtn.prop("disabled", true).text("Saving...");
+
     try {
+      // Send data to server
       await axios.post("/admin/user/edit", formData);
-      showNotification("Member details updated successfully", "success");
+
+      alert("Member information saved successfully!");
     } catch (error) {
       console.error("Error:", error);
-      showNotification(
-        error.response?.data?.message || "Error updating member",
-        "error"
-      );
+      alert("Failed to save member information. Please try again.");
     } finally {
-      $submitBtn.prop("disabled", false);
+      $submitBtn.prop("disabled", false).text("Save Changes");
     }
   });
 
-  // Points input handling
-  $pointsInput.on("change", async function () {
-    const newPoints = parseInt($(this).val());
+  // Handle Phone formatting
+  $('input[name="memberPhone"]').on("input", function () {
+    let value = $(this)
+      .val()
+      .replace(/[^0-9]/g, "");
 
-    if (isNaN(newPoints) || newPoints < 0) {
-      $(this).val(originalPoints);
-      showNotification("Points must be a positive number", "error");
-      return;
+    if (value.length > 11) value = value.substr(0, 11);
+
+    if (value.length >= 3 && value.length <= 7) {
+      value = value.slice(0, 3) + "-" + value.slice(3);
+    } else if (value.length > 7) {
+      value =
+        value.slice(0, 3) + "-" + value.slice(3, 7) + "-" + value.slice(7);
     }
 
-    if (newPoints === parseInt(originalPoints)) return;
-
-    try {
-      await axios.post("/admin/user/edit", {
-        _id: memberId,
-        memberPoints: newPoints,
-      });
-
-      originalPoints = newPoints;
-      showNotification("Member points updated successfully", "success");
-    } catch (error) {
-      console.error("Error:", error);
-      $(this).val(originalPoints);
-      showNotification("Error updating points", "error");
-    }
+    $(this).val(value);
   });
-
-  // Helper functions
-  function showNotification(message, type) {
-    const $existing = $(".notification");
-    if ($existing.length) $existing.remove();
-
-    const $notification = $(`
-      <div class="notification ${type}">
-        <i class="fas fa-${
-          type === "success" ? "check-circle" : "exclamation-circle"
-        }"></i>
-        ${message}
-      </div>
-    `).appendTo("body");
-
-    setTimeout(() => {
-      $notification.addClass("show");
-      setTimeout(() => {
-        $notification.removeClass("show");
-        setTimeout(() => $notification.remove(), 300);
-      }, 3000);
-    }, 10);
-  }
-
-  // Member status management
-  $("#blockBtn").on("click", async function () {
-    if (!confirm("Are you sure you want to block this member?")) return;
-    await updateMemberStatus(this, "BLOCKED");
-  });
-
-  $("#unblockBtn").on("click", async function () {
-    if (!confirm("Are you sure you want to unblock this member?")) return;
-    await updateMemberStatus(this, "ACTIVE");
-  });
-
-  $("#deleteBtn").on("click", async function () {
-    if (
-      !confirm(
-        "Are you sure you want to delete this member? This action cannot be undone."
-      )
-    )
-      return;
-    await updateMemberStatus(this, "DELETED");
-  });
-
-  async function updateMemberStatus($btn, newStatus) {
-    $btn = $($btn);
-    $btn.prop("disabled", true);
-
-    try {
-      await axios.post("/admin/user/edit", {
-        _id: memberId,
-        memberStatus: newStatus,
-      });
-
-      showNotification(
-        `Member ${newStatus.toLowerCase()} successfully`,
-        "success"
-      );
-      setTimeout(() => location.reload(), 500);
-    } catch (error) {
-      console.error("Error:", error);
-      showNotification(
-        error.response?.data?.message || `Error updating member status`,
-        "error"
-      );
-      $btn.prop("disabled", false);
-    }
-  }
-
-  // Remove old status change handler code
-  $("#statusSelect")
-    .on("change", async function () {
-      const newStatus = $(this).val();
-      const $select = $(this);
-
-      if (
-        !confirm(
-          `Are you sure you want to change member status to ${newStatus}?`
-        )
-      ) {
-        $select.val($select.data("original-value"));
-        return;
-      }
-
-      $select.prop("disabled", true);
-      try {
-        await axios.post("/admin/user/edit", {
-          _id: memberId,
-          memberStatus: newStatus,
-        });
-
-        $select.data("original-value", newStatus);
-        showNotification("Member status updated successfully", "success");
-
-        // Update status indicator
-        const $statusIndicator = $(".status-indicator");
-        $statusIndicator
-          .removeClass("active inactive blocked")
-          .addClass(newStatus.toLowerCase());
-
-        // Update status text
-        $statusIndicator.next().text(newStatus);
-      } catch (error) {
-        console.error("Error:", error);
-        $select.val($select.data("original-value"));
-        showNotification(
-          error.response?.data?.message || "Error updating status",
-          "error"
-        );
-      } finally {
-        $select.prop("disabled", false);
-      }
-    })
-    .each(function () {
-      // Store original value for cancellation
-      $(this).data("original-value", $(this).val());
-    });
 });
