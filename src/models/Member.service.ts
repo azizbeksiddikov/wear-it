@@ -176,7 +176,7 @@ class MemberService {
   }
 
   //  Dashboard
-  public async getDashboard(thirtyDaysAgo: Date): Promise<number> {
+  public async getDashboard(): Promise<number> {
     return await this.memberModel
       .countDocuments({
         memberStatus: MemberStatus.ACTIVE,

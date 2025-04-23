@@ -215,10 +215,13 @@ class OrderService {
   }
 
   //  Dashboard
-  public async getDashboard(thirtyDaysAgo: Date): Promise<number> {
+  public async getDashboard(): Promise<number> {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
     return await this.orderModel
       .countDocuments({
-        orderStatus: OrderStatus.PROCESSING,
+        orderStatus: { $ne: OrderStatus.PAUSED },
         updatedAt: { $gte: thirtyDaysAgo },
       })
       .exec();

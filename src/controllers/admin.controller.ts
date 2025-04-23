@@ -24,13 +24,10 @@ adminController.goHome = async (req: AdminRequest, res: Response) => {
   let dashboard: Dashboard | any = {};
 
   if (req.session?.member?.memberType === MemberType.ADMIN) {
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
     const [totalMembers, totalProducts, totalOrders] = await Promise.all([
-      memberService.getDashboard(thirtyDaysAgo),
-      productService.getDashboard(thirtyDaysAgo),
-      orderService.getDashboard(thirtyDaysAgo),
+      memberService.getDashboard(),
+      productService.getDashboard(),
+      orderService.getDashboard(),
     ]);
 
     dashboard.totalMembers = totalMembers;
