@@ -10,38 +10,43 @@
     <div class="signup-container">
       <h2 class="signup-text">Sign Up</h2>
 
-      <form id="signupForm" action="/admin/signup" method="POST">
+      <form
+        onsubmit="return validateSignupForm()"
+        action="/admin/signup"
+        method="POST"
+        enctype="multipart/form-data"
+      >
         <div class="label">
-          <label for="memberEmail" class="form-label">Email address</label>
+          <label for="member-email" class="form-label">Email address</label>
           <input
             type="email"
             class="form-control"
-            id="memberEmail"
-            name="memberEmail"
+            id="member-email"
+            name="member-email"
             placeholder="example@gmail.com"
             required
           />
         </div>
 
         <div class="label">
-          <label for="memberPhone" class="form-label">Phone Number</label>
+          <label for="member-phone" class="form-label">Phone Number</label>
           <input
             type="tel"
             class="form-control"
-            id="memberPhone"
-            name="memberPhone"
+            id="member-phone"
+            name="member-phone"
             placeholder="010-1234-5678"
             required
           />
         </div>
         <div class="label">
-          <label for="memberPassword" class="form-label">Password</label>
+          <label for="member-password" class="form-label">Password</label>
           <div class="password-field">
             <input
               type="password"
               class="form-control"
-              id="memberPassword"
-              name="memberPassword"
+              id="member-password"
+              name="member-password"
               placeholder="Password"
               required
             />
@@ -53,13 +58,15 @@
         </div>
 
         <div class="label">
-          <label for="memberPasswordConfirm" class="form-label">Password</label>
+          <label for="member-password-confirm" class="form-label"
+            >Password</label
+          >
           <div class="password-field">
             <input
               type="password"
               class="form-control"
-              id="memberPasswordConfirm"
-              name="memberPasswordConfirm"
+              id="member-password-confirm"
+              name="member-password-confirm"
               placeholder="Confirm Password"
               required
             />

@@ -24,6 +24,7 @@ export enum Message {
   TOKEN_CREATION_FAILED = "Token creation error!",
   FILE_UPLOAD_FAILED = "File upload failed!",
   RATING_OUT_OF_RANGE = "Rating is out of range!",
+  EXISTING_USER = "User already exists!",
 }
 
 class Errors extends Error {
