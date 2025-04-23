@@ -108,8 +108,6 @@ class OrderService {
       .aggregate([
         { $match: match },
         { $sort: { updatedAt: -1 } },
-        { $skip: (inquiry.page - 1) * inquiry.limit },
-        { $limit: inquiry.limit },
         {
           $lookup: {
             from: "orderItems",
@@ -151,17 +149,15 @@ class OrderService {
 
     const match: T = { _id: orderId, memberId: memberId };
 
+    console.log("_id", orderId, "orderStatus", input?.orderStatus);
+
     const result = await this.orderModel
       .findOneAndUpdate(match, input, { new: true })
       .lean()
       .exec();
     if (!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
 
-    // PROCESSING = "PROCESSING"
-    // CANCELLED = "CANCELLED",
-
     if (input.orderStatus === OrderStatus.PROCESSING) {
-      // Use a single MongoDB command that joins data and performs updates
       const db = this.orderModel.db.db;
 
       // Get the order items for this order
