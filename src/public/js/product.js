@@ -1,14 +1,27 @@
 document.addEventListener("DOMContentLoaded", function () {
+  const productId = $("#productId").val();
+
+  $("#product-delete-btn").on("click", async function () {
+    if (!confirm("Are you sure you want to delete this product?")) return;
+
+    try {
+      await axios.post("/admin/product/delete", {
+        productId: productId,
+      });
+      showNotification("Product deleted successfully", "success");
+      window.location.href = "/admin/product/all";
+    } catch (error) {
+      console.error("Error:", error);
+      showNotification("Error deleting product", "error");
+    }
+  });
+
   // Initialize all features
   const ProductManager = {
     init() {
       this.initCarousel();
       this.initProductHandlers();
       this.initVariantHandlers();
-    },
-
-    getProductId() {
-      return document.getElementById("productId")?.value;
     },
 
     async updateProduct(data) {
@@ -34,11 +47,9 @@ document.addEventListener("DOMContentLoaded", function () {
     initProductHandlers() {
       this.initStatusToggles();
       this.initDescriptionEditor();
-      this.initDeleteProduct();
     },
 
     initStatusToggles() {
-      const productId = this.getProductId();
       document.querySelectorAll(".product-status-toggle").forEach((toggle) => {
         toggle.addEventListener("change", () =>
           this.updateProduct({
@@ -73,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
           newDesc || "No description available";
         elements.displayEl.style.display = "block";
         elements.editEl.style.display = "none";
-        this.updateProduct({ _id: this.getProductId(), productDesc: newDesc });
+        this.updateProduct({ _id: productId, productDesc: newDesc });
       });
 
       elements.cancelBtn.addEventListener("click", () => {
@@ -82,32 +93,6 @@ document.addEventListener("DOMContentLoaded", function () {
           currentText === "No description available" ? "" : currentText;
         elements.displayEl.style.display = "block";
         elements.editEl.style.display = "none";
-      });
-    },
-
-    initDeleteProduct() {
-      const deleteBtn = document.getElementById("product-delete-btn");
-      if (!deleteBtn) return;
-
-      deleteBtn.addEventListener("click", async function () {
-        if (
-          this.disabled ||
-          !confirm("Are you sure you want to delete this product?")
-        )
-          return;
-
-        this.disabled = true;
-        try {
-          await axios.post("/admin/product/delete", {
-            id: ProductManager.getProductId(),
-          });
-          showNotification("Product deleted successfully", "success");
-          setTimeout(() => (window.location.href = "/admin/product/all"), 500);
-        } catch (error) {
-          console.error("Error:", error);
-          showNotification("Error deleting product", "error");
-          this.disabled = false;
-        }
       });
     },
 
@@ -415,7 +400,7 @@ function createVariantRow(variant) {
       </td>
       <td class="actions-cell">
         <button class="btn-edit-variant" title="Edit variant">
-          <i class="fas fa-pencil-alt"></i>
+                  <i class="fas fa-save"></i>
         </button>
         <button class="btn-delete-variant" title="Delete variant">
           <i class="fas fa-trash"></i>

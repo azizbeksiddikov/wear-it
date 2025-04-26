@@ -140,8 +140,33 @@ class ProductService {
         {
           $lookup: {
             from: "reviews",
-            localField: "_id",
-            foreignField: "productId",
+            let: { productId: "$_id" },
+            pipeline: [
+              { $match: { $expr: { $eq: ["$productId", "$$productId"] } } },
+              {
+                $lookup: {
+                  from: "members",
+                  localField: "memberId",
+                  foreignField: "_id",
+                  pipeline: [
+                    {
+                      $project: {
+                        _id: 1,
+                        memberEmail: 1,
+                        memberFullName: 1,
+                        memberImage: 1,
+                      },
+                    },
+                  ],
+                  as: "memberData",
+                },
+              },
+              {
+                $addFields: {
+                  memberData: { $arrayElemAt: ["$memberData", 0] },
+                },
+              },
+            ],
             as: "productReviews",
           },
         },

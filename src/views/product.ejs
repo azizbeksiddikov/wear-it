@@ -45,9 +45,11 @@
             <button class="carousel-arrow carousel-next" id="carousel-next">
               <i class="fas fa-angle-right"></i>
             </button>
+            <% } %>
           </div>
 
           <!-- Image counter indicator -->
+          <% if (product.productImages.length > 1) { %>
           <div class="carousel-counter">
             <span id="carousel-current-number">1</span>/<span
               id="carousel-total-number"
@@ -313,7 +315,6 @@
                 id="variantPrice"
                 name="productPrice"
                 min="0"
-                step="5"
                 required
               />
             </div>
@@ -327,7 +328,6 @@
                 id="variantSalePrice"
                 name="salePrice"
                 min="0"
-                step="5"
               />
             </div>
           </div>

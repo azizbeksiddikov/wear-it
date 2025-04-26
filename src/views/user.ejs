@@ -12,49 +12,50 @@
         <h1>Member Details</h1>
       </div>
 
-      <form id="memberForm">
-        <input type="hidden" name="_id" value="<%= member._id %>" />
-        <div class="user-content">
-          <!-- Profile Card -->
-          <div class="user-profile">
-            <div class="profile-image-container">
-              <% if (member.memberImage) { %>
-              <img
-                src="<%= member.memberImage %>"
-                alt="Profile"
-                class="profile-image"
-              />
-              <% } else { %>
-              <div class="profile-image-placeholder">
-                <i class="fas fa-user"></i>
-              </div>
-              <% } %>
+      <div class="user-content">
+        <!-- Profile Card -->
+        <div class="user-profile">
+          <div class="profile-image-container">
+            <% if (member.memberImage) { %>
+            <img
+              src="<%= member.memberImage %>"
+              alt="Profile"
+              class="profile-image"
+            />
+            <% } else { %>
+            <div class="profile-image-placeholder">
+              <i class="fas fa-user"></i>
             </div>
-
-            <div class="member-type">
-              <%= member.memberType %>
-            </div>
-
-            <select class="member-status" data-status="<%= member.memberStatus %>">
-              <option value="ACTIVE" <%= member.memberStatus ==='ACTIVE' ? "selected" : "" %>> ACTIVE</option>
-              <option value="BLOCKED" <%= member.memberStatus==="BLOCKED" ? "selected" : "" %>> BLOCKED</option>
-              <option value="DELETED" <%= member.memberStatus==="DELETED" ? "selected" : "" %>> DELETED</option>
-            </select>
-            
-            <div class="points-info">
-              <i class="fas fa-star"></i>
-              <input
-                type="number"
-                id="memberPoints"
-                name="memberPoints"
-                value="<%= member.memberPoints %>"
-                min="0"
-                class="points-input"
-              />
-            </div>
+            <% } %>
           </div>
 
-          <!-- Details Form -->
+          <div class="member-type">
+            <%= member.memberType %>
+          </div>
+
+          <select class="member-status" data-status="<%= member.memberStatus %>">
+            <option value="ACTIVE" <%= member.memberStatus ==='ACTIVE' ? "selected" : "" %>> ACTIVE</option>
+            <option value="BLOCKED" <%= member.memberStatus==="BLOCKED" ? "selected" : "" %>> BLOCKED</option>
+            <option value="DELETED" <%= member.memberStatus==="DELETED" ? "selected" : "" %>> DELETED</option>
+          </select>
+          
+          <div class="points-info">
+            <i class="fas fa-star"></i>
+            <input
+              type="number"
+              id="memberPoints"
+              name="memberPoints"
+              value="<%= member.memberPoints %>"
+              min="0"
+              class="points-input"
+            />
+          </div>
+        </div>
+
+        <!-- Details Form -->
+        <form id="memberForm">
+          <input type="hidden" name="_id" value="<%= member._id %>" />
+          
           <div class="user-details">
             <div class="form-group">
               <label>Full Name</label>
@@ -98,13 +99,13 @@
               <label>Description</label>
               <textarea name="memberDesc"><%= member.memberDesc || '' %></textarea>
             </div>
+            
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
           </div>
-        </div>
-        
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary">Save Changes</button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
 
     <script src="/js/user.js"></script>

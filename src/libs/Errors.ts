@@ -25,6 +25,8 @@ export enum Message {
   FILE_UPLOAD_FAILED = "File upload failed!",
   RATING_OUT_OF_RANGE = "Rating is out of range!",
   EXISTING_USER = "User already exists!",
+  NOT_ENOUGH_POINTS = "Not enough points to create order",
+  NO_ADDRESS = "Please, add your address",
 }
 
 class Errors extends Error {

@@ -185,7 +185,7 @@ productController.deleteChosenProduct = async (
 ) => {
   try {
     console.log("deleteChosenProduct");
-    const productId = shapeIntoMongooseObjectId(req.body.id);
+    const productId = shapeIntoMongooseObjectId(req.body.productId);
     const result = await productService.deleteChosenProduct(productId);
 
     res.status(HttpCode.OK).json({ data: result });

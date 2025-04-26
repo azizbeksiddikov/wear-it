@@ -1,5 +1,6 @@
 import orderModel from "../schema/Order.model";
 import orderItemModel from "../schema/OrderItem.model";
+import memberModel from "../schema/Member.model";
 import { Member } from "../libs/types/member";
 import {
   Order,
@@ -19,10 +20,12 @@ import { ClientSession } from "mongoose";
 class OrderService {
   private readonly orderModel;
   private readonly orderItemModel;
+  private readonly memberModel;
 
   constructor() {
     this.orderModel = orderModel;
     this.orderItemModel = orderItemModel;
+    this.memberModel = memberModel;
   }
 
   public async createOrder(member: Member, input: OrderInput): Promise<Order> {
@@ -146,10 +149,24 @@ class OrderService {
   ): Promise<Order> {
     const memberId = shapeIntoMongooseObjectId(member._id),
       orderId = shapeIntoMongooseObjectId(input._id);
+    let _member = (await this.memberModel
+      .findById(memberId)
+      .exec()) as unknown as Member;
+    if (!_member) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
 
     const match: T = { _id: orderId, memberId: memberId };
 
-    console.log("_id", orderId, "orderStatus", input?.orderStatus);
+    if (input.orderStatus === OrderStatus.PROCESSING) {
+      if (!_member.memberAddress || _member.memberAddress.trim() === "") {
+        throw new Errors(HttpCode.BAD_REQUEST, Message.NO_ADDRESS);
+      }
+      if (
+        !_member.memberPoints ||
+        _member.memberPoints < input.orderTotalAmount
+      ) {
+        throw new Errors(HttpCode.BAD_REQUEST, Message.NOT_ENOUGH_POINTS);
+      }
+    }
 
     const result = await this.orderModel
       .findOneAndUpdate(match, input, { new: true })
@@ -157,10 +174,10 @@ class OrderService {
       .exec();
     if (!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
 
+    // Change the Order Quantity and User Points
     if (input.orderStatus === OrderStatus.PROCESSING) {
       const db = this.orderModel.db.db;
 
-      // Get the order items for this order
       const orderItems = (await this.orderItemModel
         .find({ orderId: orderId })
         .lean()) as OrderItem[];
@@ -174,11 +191,18 @@ class OrderService {
             { $inc: { stockQuantity: -(item.itemQuantity || 1) } }
           );
       }
-    } else if (input.orderStatus === OrderStatus.CANCELLED) {
-      // Use a single MongoDB command that joins data and performs updates
-      const db = this.orderModel.db.db;
 
-      // Get the order items for this order
+      _member = (await this.memberModel
+        .findByIdAndUpdate(
+          memberId,
+          { memberPoints: _member.memberPoints - input.orderTotalAmount },
+          { new: true }
+        )
+        .lean()
+        .exec()) as unknown as Member;
+    } else if (input.orderStatus === OrderStatus.CANCELLED) {
+      // Update the Order Quantity
+      const db = this.orderModel.db.db;
       const orderItems = (await this.orderItemModel
         .find({ orderId: orderId })
         .lean()) as OrderItem[];
@@ -192,9 +216,20 @@ class OrderService {
             { $inc: { stockQuantity: item.itemQuantity || 1 } }
           );
       }
+      // Update Member Points
+
+      _member = (await this.memberModel
+        .findByIdAndUpdate(
+          memberId,
+          { memberPoints: _member.memberPoints + input.orderTotalAmount },
+          { new: true }
+        )
+        .lean()
+        .exec()) as unknown as Member;
     }
 
-    return result as unknown as Order;
+    // change from result to { order: result, member: _member }
+    return { order: result, member: _member } as unknown as Order;
   }
 
   public async deleteOrder(memberId: ObjectId, input: ObjectId) {

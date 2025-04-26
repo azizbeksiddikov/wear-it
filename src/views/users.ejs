@@ -28,8 +28,8 @@
                 <td>
                   <div class="user-bio">
                     <a href="/admin/users/<%= user._id %>">
-                      <img src="<%= user.memberImage ?? "/img/default-user.webp"
-                      %>" alt="<%= user.memberFullName %>" class="users-avatar" />
+                      <img src="<%= user.memberImage ? user.memberImage : '/img/default-user.webp' %>" 
+                      alt="<%= user.memberFullName %>" class="users-avatar" />
                       <div class="users-details">
                         <div class="users-name">
                           <%= user.memberFullName ?? "No name"%>
