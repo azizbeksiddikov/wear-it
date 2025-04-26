@@ -21,7 +21,11 @@ const adminController: T = {},
 /** Home **/
 adminController.goHome = async (req: AdminRequest, res: Response) => {
   console.log("goHome");
-  let dashboard: Dashboard | any = {};
+  let dashboard: Dashboard = {
+    totalMembers: 0,
+    totalOrders: 0,
+    totalProducts: 0,
+  };
 
   if (req.session?.member?.memberType === MemberType.ADMIN) {
     const [totalMembers, totalProducts, totalOrders] = await Promise.all([
@@ -107,7 +111,7 @@ adminController.logout = async (req: AdminRequest, res: Response) => {
   try {
     console.log("logout");
 
-    req.session.destroy(function (err) {
+    req.session.destroy(function () {
       res.redirect("/admin/login");
     });
   } catch (err) {

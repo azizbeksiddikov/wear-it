@@ -88,7 +88,7 @@ class MemberService {
         throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
       return result as unknown as Member;
     } catch (err) {
-      console.log("Error, model:updateMember");
+      console.log("Error, model:updateMember", err);
       throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
     }
   }
@@ -110,6 +110,7 @@ class MemberService {
 
       return result as unknown as Member;
     } catch (err) {
+      console.log("Error, model:processSignup", err);
       throw new Errors(HttpCode.BAD_REQUEST, Message.CREATE_FAILED);
     }
   }

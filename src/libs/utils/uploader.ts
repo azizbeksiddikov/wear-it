@@ -1,10 +1,10 @@
-import path from "path";
 import multer from "multer";
 import { v4 } from "uuid";
-import fs from "fs";
 import { supabase } from "./supabase";
 import { decode } from "base64-arraybuffer";
 import Errors, { HttpCode, Message } from "../Errors";
+// import path from "path";
+// import fs from "fs";
 
 // function getTargetImageStorage(address: any) {
 //   const targetPath = `./uploads/${address}`;
@@ -76,7 +76,7 @@ export const deleteFileFromSupabase = async (
     const urlParts = fileUrl.split("/");
     const fileName = urlParts[urlParts.length - 1];
 
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from(folderName)
       .remove([`/${fileName}`]);
 

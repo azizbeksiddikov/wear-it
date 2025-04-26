@@ -6,7 +6,6 @@ import {
   Product,
   ProductInput,
   ProductInquiry,
-  ProductUpdateInput,
   ProductVariantUpdate,
 } from "../libs/types/product";
 import Errors from "../libs/Errors";
@@ -163,8 +162,6 @@ productController.updateChosenProduct = async (
 ) => {
   try {
     console.log("updateChosenProduct");
-
-    const data: ProductUpdateInput = req.body;
 
     const result = await productService.updateChosenProduct(req.body);
 
