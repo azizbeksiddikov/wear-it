@@ -3,14 +3,11 @@
   "version": "1.0.0",
   "description": "This is a wear-it project's backend",
   "main": "src/server.ts",
-  "type": "module",
   "scripts": {
     "start": "ts-node src/server.ts",
     "start:dev": "nodemon --exec ts-node src/server.ts",
     "build": "tsc",
     "train": "nodemon --exec ts-node src/train.ts",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
