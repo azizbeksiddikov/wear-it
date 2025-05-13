@@ -6,6 +6,7 @@
   "scripts": {
     "start": "ts-node src/server.ts",
     "start:dev": "nodemon --exec ts-node src/server.ts",
+    "start:prod": "node dist/server.js",
     "build": "tsc",
     "train": "nodemon --exec ts-node src/train.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -21,6 +22,7 @@
     "dotenv": "^16.0.0",
     "ejs": "^3.1.6",
     "express": "^4.17.3",
+    "fs-extra": "^11.1.1",
     "express-session": "^1.17.3",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.30.1",

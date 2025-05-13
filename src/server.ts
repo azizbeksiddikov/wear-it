@@ -1,5 +1,7 @@
 import dotenv from "dotenv";
-dotenv.config();
+dotenv.config({
+  path: process.env.NODE_ENV === "production" ? ".env.production" : ".env",
+});
 import mongoose from "mongoose";
 import app from "./app";
 
@@ -21,7 +23,6 @@ mongoose.Schema.Types.String.set("trim", true);
 
     app.listen(PORT, () => {
       console.log(`Server running on port: ${PORT}`);
-      console.log(`Admin dashboard: http://localhost:${PORT}/admin\n`);
     });
   } catch (error) {
     console.error("Error starting server:", error);

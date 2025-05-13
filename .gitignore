@@ -3,8 +3,6 @@ project-outlines/
 uploads/
 input_images/
 
-
-
 .DS_Store
 
 # files
@@ -86,6 +84,7 @@ web_modules/
 
 # dotenv environment variable files
 .env
+.env.production
 .env.development.local
 .env.test.local
 .env.production.local

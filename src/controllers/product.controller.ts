@@ -11,7 +11,7 @@ import {
 import Errors from "../libs/Errors";
 import { HttpCode } from "../libs/Errors";
 import { Message } from "../libs/Errors";
-import { DOMAIN_NAME, shapeIntoMongooseObjectId } from "../libs/config";
+import { shapeIntoMongooseObjectId } from "../libs/config";
 import { uploadFileToSupabase } from "../libs/utils/uploader";
 import { Direction } from "../libs/enums/common.enum";
 import { ProductCategory } from "../libs/enums/product.enum";
@@ -80,7 +80,9 @@ productController.getAllProducts = async (req: AdminRequest, res: Response) => {
     const input = req.body;
     const products: Product[] = await productService.getAllProducts(input);
 
-    res.render("products", { products: products, DOMAIN_NAME: DOMAIN_NAME });
+    res.render("products", {
+      products: products,
+    });
   } catch (err) {
     console.log("Error, getAllProducts:", err);
     const message =
@@ -144,7 +146,6 @@ productController.getChosenProduct = async (
     const result = await productService.getChosenProduct(productId);
     res.render("product", {
       product: result,
-      DOMAIN_NAME: DOMAIN_NAME,
     });
   } catch (err) {
     console.log("Error, updateChosenProduct:", err);
