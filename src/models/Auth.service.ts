@@ -11,12 +11,13 @@ class AuthService {
 
   public async createToken(payload: Member) {
     return new Promise((resolve, reject) => {
-      const duration = AUTH_TIMER * 3600 * 1000;
+      // Convert hours to seconds for JWT expiresIn (JWT expects seconds, not milliseconds)
+      const durationInSeconds = AUTH_TIMER * 3600;
 
       jwt.sign(
         payload,
         this.secretToken,
-        { expiresIn: duration },
+        { expiresIn: durationInSeconds },
         (err, token) => {
           if (err)
             reject(
@@ -29,12 +30,16 @@ class AuthService {
   }
 
   public async verifyToken(token: string): Promise<Member> {
-    const result: Member = (await jwt.verify(
-      token,
-      this.secretToken
-    )) as Member;
+    try {
+      const result: Member = (await jwt.verify(
+        token,
+        this.secretToken
+      )) as Member;
 
-    return result;
+      return result;
+    } catch (err) {
+      throw new Errors(HttpCode.UNAUTHORIZED, Message.NOT_AUTHENTICATED);
+    }
   }
 }
 

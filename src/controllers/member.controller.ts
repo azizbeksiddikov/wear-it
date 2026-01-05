@@ -29,6 +29,9 @@ memberController.signup = async (req: Request, res: Response) => {
     res.cookie("accessToken", token, {
       maxAge: AUTH_TIMER * 3600 * 1000,
       httpOnly: false,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
     });
 
     res.status(HttpCode.CREATED).json({ member: result, accessToken: token });
@@ -50,6 +53,9 @@ memberController.login = async (req: Request, res: Response) => {
     res.cookie("accessToken", token, {
       maxAge: AUTH_TIMER * 3600 * 1000, // hours
       httpOnly: false,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
     });
 
     res.status(HttpCode.OK).json({ member: result, accessToken: token });
@@ -64,7 +70,12 @@ memberController.logout = async (req: VerifiedMemberRequest, res: Response) => {
   try {
     console.log("logout");
 
-    res.clearCookie("accessToken", { httpOnly: true });
+    res.clearCookie("accessToken", {
+      httpOnly: false,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+    });
 
     res.status(HttpCode.OK).json({ logout: true });
   } catch (err) {
@@ -107,15 +118,22 @@ memberController.retrieveAuth = async (
   try {
     console.log("retrieveAuth");
     const token: string = req.cookies?.accessToken;
-    if (token) req.member = await authService.verifyToken(token);
-    else req.member = null;
+    if (token) {
+      try {
+        req.member = await authService.verifyToken(token);
+      } catch (err) {
+        // If token is invalid, just set member to null (optional auth)
+        req.member = null;
+      }
+    } else {
+      req.member = null;
+    }
 
     next();
   } catch (err) {
     console.log("Error, retrieveAuth", err);
-    if (err instanceof Errors) res.status(err.code).json(err);
-    else res.status(Errors.standard.code).json(Errors.standard);
-    next(err);
+    req.member = null;
+    next();
   }
 };
 
