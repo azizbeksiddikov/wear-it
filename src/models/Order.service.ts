@@ -13,7 +13,7 @@ import {
 import { shapeIntoMongooseObjectId } from "../libs/config";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import { OrderStatus } from "../libs/enums/order.enum";
-import { ObjectId } from "mongoose";
+import { Types } from "mongoose";
 import { T } from "../libs/types/common";
 import { ClientSession } from "mongoose";
 
@@ -75,7 +75,7 @@ class OrderService {
   }
 
   private async recordOrderItem(
-    orderId: ObjectId,
+    orderId: Types.ObjectId,
     input: OrderInput,
     session: ClientSession // Add session parameter
   ): Promise<void> {
@@ -180,16 +180,19 @@ class OrderService {
 
       const orderItems = (await this.orderItemModel
         .find({ orderId: orderId })
-        .lean()) as OrderItem[];
+        .lean()
+        .exec()) as unknown as OrderItem[];
 
       // For each item, update the corresponding product variant
-      for (const item of orderItems) {
-        await db
-          .collection("productVariants")
-          .updateOne(
-            { _id: item.variantId },
-            { $inc: { stockQuantity: -(item.itemQuantity || 1) } }
-          );
+      if (db) {
+        for (const item of orderItems) {
+          await db
+            .collection("productVariants")
+            .updateOne(
+              { _id: item.variantId },
+              { $inc: { stockQuantity: -(item.itemQuantity || 1) } }
+            );
+        }
       }
 
       _member = (await this.memberModel
@@ -205,16 +208,19 @@ class OrderService {
       const db = this.orderModel.db.db;
       const orderItems = (await this.orderItemModel
         .find({ orderId: orderId })
-        .lean()) as OrderItem[];
+        .lean()
+        .exec()) as unknown as OrderItem[];
 
       // For each item, update the corresponding product variant
-      for (const item of orderItems) {
-        await db
-          .collection("productVariants")
-          .updateOne(
-            { _id: item.variantId },
-            { $inc: { stockQuantity: item.itemQuantity || 1 } }
-          );
+      if (db) {
+        for (const item of orderItems) {
+          await db
+            .collection("productVariants")
+            .updateOne(
+              { _id: item.variantId },
+              { $inc: { stockQuantity: item.itemQuantity || 1 } }
+            );
+        }
       }
       // Update Member Points
 
@@ -232,7 +238,7 @@ class OrderService {
     return { order: result, member: _member } as unknown as Order;
   }
 
-  public async deleteOrder(memberId: ObjectId, input: ObjectId) {
+  public async deleteOrder(memberId: Types.ObjectId, input: Types.ObjectId) {
     const orderId = shapeIntoMongooseObjectId(input);
     const match: T = {
       _id: orderId,
@@ -260,8 +266,8 @@ class OrderService {
 
   // For other Services
   public async validateOrder(
-    memberId: ObjectId,
-    productId: ObjectId
+    memberId: Types.ObjectId,
+    productId: Types.ObjectId
   ): Promise<boolean> {
     const count = await this.orderItemModel.countDocuments({
       productId,

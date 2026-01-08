@@ -121,7 +121,7 @@ memberController.retrieveAuth = async (
     if (token) {
       try {
         req.member = await authService.verifyToken(token);
-      } catch (err) {
+      } catch {
         // If token is invalid, just set member to null (optional auth)
         req.member = null;
       }

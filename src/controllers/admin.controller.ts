@@ -21,7 +21,7 @@ const adminController: T = {},
 /** Home **/
 adminController.goHome = async (req: AdminRequest, res: Response) => {
   console.log("goHome");
-  let dashboard: Dashboard = {
+  const dashboard: Dashboard = {
     totalMembers: 0,
     totalOrders: 0,
     totalProducts: 0,

@@ -1,12 +1,16 @@
 import dotenv from "dotenv";
-dotenv.config({
-  path: process.env.NODE_ENV === "production" ? ".env.production" : ".env",
-});
+dotenv.config({ quiet: true });
+
 import mongoose from "mongoose";
 import app from "./app";
 
-const PORT = process.env.PORT ?? 3003;
+const PORT = process.env.PORT;
 const MONGO_URL = process.env.MONGO_URL;
+
+if (!PORT) {
+  console.error("PORT is not defined in environment variables");
+  process.exit(1);
+}
 
 if (!MONGO_URL) {
   console.error("MONGO_URL is not defined in environment variables");
@@ -18,7 +22,7 @@ mongoose.Schema.Types.String.set("trim", true);
 
 (async function startServer() {
   try {
-    await mongoose.connect(MONGO_URL as string, {});
+    await mongoose.connect(MONGO_URL, {});
     console.log("MongoDB connected successfully");
 
     app.listen(PORT, () => {

@@ -1,6 +1,6 @@
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import { shapeIntoMongooseObjectId } from "../libs/config";
-import { ObjectId } from "mongoose";
+import { Types } from "mongoose";
 import { T } from "../libs/types/common";
 import ReviewModel from "../schema/Review.model";
 import { Review, ReviewInput, ReviewUpdateInput } from "../libs/types/review";
@@ -20,7 +20,7 @@ class ReviewService {
   }
 
   public async createReview(
-    memberId: ObjectId,
+    memberId: Types.ObjectId,
     input: ReviewInput
   ): Promise<Review> {
     const { productId, rating, comment } = input;
@@ -73,7 +73,7 @@ class ReviewService {
   }
 
   public async updateReview(
-    memberId: ObjectId,
+    memberId: Types.ObjectId,
     input: ReviewUpdateInput
   ): Promise<Review> {
     const { _id, rating, comment } = input;
@@ -126,7 +126,7 @@ class ReviewService {
   }
 
   public async deleteReview(
-    memberId: ObjectId,
+    memberId: Types.ObjectId,
     reviewId: string
   ): Promise<Review> {
     const match: T = {

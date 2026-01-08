@@ -1,9 +1,9 @@
-import { ObjectId } from "mongoose";
+import { Types } from "mongoose";
 
 export interface Review {
-  _id: ObjectId;
-  productId: ObjectId;
-  memberId: ObjectId;
+  _id: Types.ObjectId;
+  productId: Types.ObjectId;
+  memberId: Types.ObjectId;
   rating: number;
   comment?: string;
   createdAt: Date;
@@ -11,13 +11,13 @@ export interface Review {
 }
 
 export interface ReviewInput {
-  productId: ObjectId;
+  productId: Types.ObjectId;
   rating: number;
   comment?: string;
 }
 
 export interface ReviewUpdateInput {
-  _id: ObjectId;
+  _id: Types.ObjectId;
   rating?: number;
   comment?: string;
 }

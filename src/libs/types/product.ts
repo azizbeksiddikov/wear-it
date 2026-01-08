@@ -1,10 +1,10 @@
-import { ObjectId } from "mongoose";
+import { Types } from "mongoose";
 import { ProductCategory, ProductGender } from "../enums/product.enum";
 import { Direction } from "../enums/common.enum";
 import { Review } from "./review";
 
 export interface Product {
-  _id: ObjectId;
+  _id: Types.ObjectId;
   productName: string;
   productCategory: ProductCategory;
   productGender: ProductGender;
@@ -35,7 +35,7 @@ export interface ProductInput {
 }
 
 export interface ProductUpdateInput {
-  _id: ObjectId;
+  _id: Types.ObjectId;
   productDesc?: string;
   isActive?: boolean;
   isFeatured?: boolean;
@@ -43,8 +43,8 @@ export interface ProductUpdateInput {
 }
 
 export interface ProductVariant {
-  _id: ObjectId;
-  productId: ObjectId;
+  _id: Types.ObjectId;
+  productId: Types.ObjectId;
   size: string;
   color: string;
   productPrice: number;
@@ -55,7 +55,7 @@ export interface ProductVariant {
 }
 
 export interface ProductVariantInput {
-  productId: ObjectId;
+  productId: Types.ObjectId;
   size: string;
   color: string;
   stockQuantity: number;
@@ -64,7 +64,7 @@ export interface ProductVariantInput {
 }
 
 export interface ProductVariantUpdate {
-  _id: ObjectId;
+  _id: Types.ObjectId;
   size?: string;
   color?: string;
   stockQuantity?: number;

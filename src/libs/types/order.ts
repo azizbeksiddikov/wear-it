@@ -1,10 +1,10 @@
-import { ObjectId } from "mongoose";
+import { Types } from "mongoose";
 import { OrderStatus } from "../enums/order.enum";
 import { ProductCategory, ProductGender } from "../enums/product.enum";
 
 export interface Order {
-  _id: ObjectId;
-  memberId: ObjectId;
+  _id: Types.ObjectId;
+  memberId: Types.ObjectId;
   orderDate: Date;
   orderStatus: OrderStatus;
   orderShippingAddress: string;
@@ -16,7 +16,7 @@ export interface Order {
 }
 
 export interface OrderInput {
-  memberId: ObjectId;
+  memberId: Types.ObjectId;
   orderShippingAddress: string;
   orderSubTotal: number;
   orderShippingCost: number;
@@ -26,7 +26,7 @@ export interface OrderInput {
 }
 
 export interface OrderUpdateInput {
-  _id: ObjectId;
+  _id: Types.ObjectId;
   orderStatus: OrderStatus;
   orderTotalAmount: number;
   orderShippingAddress: string;
@@ -35,10 +35,10 @@ export interface OrderUpdateInput {
 }
 
 export interface OrderItem {
-  _id: ObjectId;
-  orderId: ObjectId;
-  productId: ObjectId;
-  variantId: ObjectId;
+  _id: Types.ObjectId;
+  orderId: Types.ObjectId;
+  productId: Types.ObjectId;
+  variantId: Types.ObjectId;
   productName: string;
   productCategory: ProductCategory;
   productGender: ProductGender;
@@ -53,10 +53,10 @@ export interface OrderItem {
 }
 
 export interface OrderItemInput {
-  orderId?: ObjectId;
+  orderId?: Types.ObjectId;
 
-  productId: ObjectId;
-  variantId: ObjectId;
+  productId: Types.ObjectId;
+  variantId: Types.ObjectId;
   productName: string;
   productCategory: ProductCategory;
   productGender: ProductGender;

@@ -37,7 +37,7 @@ class AuthService {
       )) as Member;
 
       return result;
-    } catch (err) {
+    } catch {
       throw new Errors(HttpCode.UNAUTHORIZED, Message.NOT_AUTHENTICATED);
     }
   }

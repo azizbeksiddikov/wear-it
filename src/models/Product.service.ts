@@ -17,7 +17,7 @@ import {
   StatisticModifierRelative,
   T,
 } from "../libs/types/common";
-import { ObjectId } from "mongoose";
+import { Types } from "mongoose";
 import ProductVariantModel from "../schema/ProductVariant.model";
 import { deleteFilesFromSupabase } from "../libs/utils/uploader";
 import { Direction } from "../libs/enums/common.enum";
@@ -119,14 +119,14 @@ class ProductService {
   }
 
   public async getProduct(
-    memberId: ObjectId | null,
+    memberId: Types.ObjectId | null,
     id: string
   ): Promise<Product> {
     const productId = shapeIntoMongooseObjectId(id);
 
     const match: T = { _id: productId, isActive: true };
 
-    let result = await this.productModel
+    const result = await this.productModel
       .aggregate([
         { $match: match },
         {
@@ -249,7 +249,7 @@ class ProductService {
     return result as unknown as Product;
   }
 
-  public async getChosenProduct(productId: ObjectId): Promise<Product> {
+  public async getChosenProduct(productId: Types.ObjectId): Promise<Product> {
     const product = (await this.productModel
       .findById(productId)
       .lean()
@@ -263,7 +263,9 @@ class ProductService {
     return product as unknown as Product;
   }
 
-  public async deleteChosenProduct(productId: ObjectId): Promise<Product> {
+  public async deleteChosenProduct(
+    productId: Types.ObjectId
+  ): Promise<Product> {
     const product = await this.productModel.findById(productId).exec();
     if (!product) {
       throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
@@ -330,7 +332,7 @@ class ProductService {
   }
 
   public async getAllProductVariants(
-    productId: ObjectId
+    productId: Types.ObjectId
   ): Promise<ProductVariant[]> {
     const result = await this.productVariantModel
       .find({ productId: productId })
@@ -340,7 +342,7 @@ class ProductService {
   }
 
   public async deleteChosenProductVariant(
-    variantId: ObjectId
+    variantId: Types.ObjectId
   ): Promise<ProductVariant> {
     const result = await this.productVariantModel
       .findByIdAndDelete(variantId)
@@ -363,8 +365,8 @@ class ProductService {
   }
 
   // Other Services
-  public async getPureProduct(productId: ObjectId): Promise<Product> {
-    let result = (await this.productModel
+  public async getPureProduct(productId: Types.ObjectId): Promise<Product> {
+    const result = (await this.productModel
       .findOne({ _id: productId, isActive: true })
       .lean()
       .exec()) as unknown as Product;
