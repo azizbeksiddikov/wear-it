@@ -12,7 +12,7 @@ coverage/
 
 # Files
 .DS_Store
-package-lock.json
+
 *.log
 npm-debug.log*
 
