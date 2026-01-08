@@ -52,6 +52,33 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
 /** 4-ROUTERS **/
+app.get("/", (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Wear It API</title>
+        <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; height: 100vh; margin: 0; display: flex; align-items: center; justify-content: center; background-color: #f4f7f6; }
+            .card { text-align: center; padding: 2rem; background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 400px; width: 100%; }
+            h1 { color: #1a1a1a; margin-bottom: 0.5rem; font-size: 1.5rem; }
+            p { color: #666; margin-bottom: 1.5rem; line-height: 1.5; }
+            a { display: inline-block; padding: 12px 32px; background: #000; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; transition: transform 0.2s, background 0.2s; }
+            a:hover { background: #333; transform: translateY(-2px); }
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            <h1>Wear It API</h1>
+            <p>Welcome! The API is running successfully. To manage products and users, please visit the admin dashboard.</p>
+            <a href="/admin">Go to Admin Panel</a>
+        </div>
+    </body>
+    </html>
+  `);
+});
 app.use("/admin", routerAdmin);
 app.use("/", router);
 
