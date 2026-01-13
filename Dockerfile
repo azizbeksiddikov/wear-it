@@ -32,12 +32,15 @@ COPY --from=builder /app/dist ./dist
 COPY src/views ./dist/views
 COPY src/public ./dist/public
 
+# Copy health check script
+COPY healthcheck.js ./healthcheck.js
+
 # Expose port (default 3003, can be overridden via env)
 EXPOSE 3003
 
 # Health check (uses PORT env var or defaults to 3003)
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-  CMD node -e "require('http').get(`http://localhost:${process.env.PORT||3003}/health`,(r)=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"
+  CMD ["node", "healthcheck.js"]
 
 # Run the application
 CMD ["node", "dist/server.js"]
