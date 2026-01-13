@@ -18,7 +18,7 @@ Modern, high-performance E-commerce Backend API built with **Node.js 24**, **Exp
 - 🛒 **Full Order Lifecycle**: Create, update, track, and manage orders with history tracking.
 - 💬 **Engagement & Analytics**: Integrated review system, product view tracking, and analytical insights.
 - 🔒 **Cloud-First Media**: Seamless integration with **Supabase** for high-performance asset storage.
-- 🐳 **Enterprise DevOps**: Fully containerized with Node 24 Alpine, memory-capped containers, and optimized build steps.
+- 🐳 **DevOps**: Fully containerized with Node 24 Alpine, memory-capped containers, and optimized build steps.
 
 ## 🛠️ Tech Stack
 
@@ -90,28 +90,6 @@ docker-compose up -d
 docker-compose -f docker-compose.dev.yml up -d
 ```
 
-## 🔌 API Reference
-
-### REST API (`/api/v1`)
-
-| Endpoint         | Method | Description                        | Auth    |
-| :--------------- | :----- | :--------------------------------- | :------ |
-| `/member/signup` | POST   | Register a new member              | Public  |
-| `/member/login`  | POST   | Member authentication              | Public  |
-| `/product/all`   | GET    | Retrieve all products with filters | Public  |
-| `/product/:id`   | GET    | Detailed product info              | Hybrid  |
-| `/order/create`  | POST   | Place a new order                  | Private |
-| `/review/create` | POST   | Submit product feedback            | Private |
-
-### Admin Dashboard (`/admin`)
-
-| Endpoint          | Method | Description            |
-| :---------------- | :----- | :--------------------- |
-| `/`               | GET    | Dashboard overview     |
-| `/users`          | GET    | User management panel  |
-| `/product/all`    | GET    | Inventory management   |
-| `/product/create` | POST   | List new catalog items |
-
 ## 📁 Project Structure
 
 ```text
@@ -129,14 +107,3 @@ wear-it-backend/
 ├── Dockerfile              # Multi-stage build definition
 └── docker-compose.yml      # Orchestration config
 ```
-
-## 🛠️ Scripts
-
-- `npm run dev`: Hot-reloading development server.
-- `npm run build`: Compiles TypeScript to `dist/`.
-- `npm run start:prod`: Executes the production build.
-- `npm start`: Runs source directly via `ts-node`.
-
-## 📄 License
-
-Distributed under the **ISC License**.

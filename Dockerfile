@@ -36,8 +36,8 @@ COPY src/public ./dist/public
 EXPOSE 3003
 
 # Health check (uses PORT env var or defaults to 3003)
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "const port = process.env.PORT || 3003; require('http').get(`http://localhost:${port}`, (r) => {process.exit(r.statusCode === 200 ? 0 : 1)}).on('error', () => process.exit(1))"
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD node -e "require('http').get(`http://localhost:${process.env.PORT||3003}/health`,(r)=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"
 
 # Run the application
 CMD ["node", "dist/server.js"]

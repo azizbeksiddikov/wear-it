@@ -51,6 +51,11 @@ app.use(function (req, res, next) {
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
+/** 4-HEALTH CHECK **/
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "healthy" });
+});
+
 /** 4-ROUTERS **/
 app.get("/", (req, res) => {
   res.send(`
