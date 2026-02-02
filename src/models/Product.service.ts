@@ -212,10 +212,10 @@ class ProductService {
     return product;
   }
   // ADMIN
-  public async getAllProducts(input: ProductInquiry): Promise<Product[]> {
+  public async getAllProducts(input?: ProductInquiry): Promise<Product[]> {
     const match: T = {};
-    if (input.productCategory) match.productCategory = input.productCategory;
-    if (input.productGender) match.productGender = input.productGender;
+    if (input?.productCategory) match.productCategory = input.productCategory;
+    if (input?.productGender) match.productGender = input.productGender;
 
     const result = await this.productModel.find(match).exec();
     if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);

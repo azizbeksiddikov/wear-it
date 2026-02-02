@@ -77,8 +77,10 @@ productController.getProduct = async (req: MemberRequest, res: Response) => {
 productController.getAllProducts = async (req: AdminRequest, res: Response) => {
   try {
     console.log("getAllProducts");
-    const input = req.body;
-    const products: Product[] = await productService.getAllProducts(input);
+    const input: ProductInquiry = req.query as unknown as ProductInquiry;
+    const products: Product[] = await productService.getAllProducts(
+      input || {}
+    );
 
     res.render("products", {
       products: products,
