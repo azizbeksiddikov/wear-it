@@ -133,7 +133,7 @@ class MemberService {
     if (!isMatch)
       throw new Errors(HttpCode.UNAUTHORIZED, Message.WRONG_PASSWORD);
 
-    const result = await this.memberModel.findById(member._id).exec();
+    const result = await this.memberModel.findById(member._id).lean().exec();
     return result as unknown as Member;
   }
 

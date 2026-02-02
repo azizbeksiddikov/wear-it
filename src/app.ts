@@ -29,15 +29,21 @@ app.use(cookieParser());
 app.use(morgan(MORGAN_FORMAT));
 
 /** 2-SESSIONS **/
+// Set COOKIE_SECURE=true in .env for HTTPS production
+const secureCookie = process.env.COOKIE_SECURE === "true";
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET as string,
     cookie: {
       maxAge: 1000 * 60 * 60 * 24, // 1 day
+      secure: secureCookie,
+      // sameSite: "lax",
+      // httpOnly: true,
     },
     store: store,
-    resave: true,
-    saveUninitialized: true,
+    resave: false,
+    saveUninitialized: false,
   })
 );
 

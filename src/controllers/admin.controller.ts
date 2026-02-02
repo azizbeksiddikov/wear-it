@@ -61,7 +61,8 @@ adminController.processSignup = async (req: AdminRequest, res: Response) => {
 
     const result = await memberService.processSignup(newMember);
 
-    req.session.member = result;
+    // Convert to plain object to avoid BSON version conflicts with session store
+    req.session.member = JSON.parse(JSON.stringify(result));
 
     req.session.save(function () {
       res.redirect("/admin");
@@ -92,9 +93,14 @@ adminController.processLogin = async (req: AdminRequest, res: Response) => {
     const input: LoginInput = req.body;
     const member = await memberService.processLogin(input);
 
-    req.session.member = member;
+    req.session.member = JSON.parse(JSON.stringify(member));
 
-    req.session.save(function () {
+    req.session.save(function (err) {
+      if (err) {
+        console.error("Session save error:", err);
+      } else {
+        console.log("Session saved successfully, ID:", req.sessionID);
+      }
       res.redirect("/admin");
     });
   } catch (err) {
