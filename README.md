@@ -1,4 +1,4 @@
-# Wear-It Backend
+# Wearit Backend
 
 ![Node.js](https://img.shields.io/badge/Node.js-24-green)
 ![Express](https://img.shields.io/badge/Express-5-blue)
@@ -9,7 +9,7 @@ Modern, high-performance E-commerce Backend API built with **Node.js 24**, **Exp
 
 ## 📖 Overview
 
-**Wear-It** is a robust, scalable e-commerce backend designed to handle complex product management, secure member authentication, and efficient order processing. It features a dual-layered routing system: a modern REST API for client applications and an EJS-powered administrative dashboard for platform management.
+**Wearit** is a robust, scalable e-commerce backend designed to handle complex product management, secure member authentication, and efficient order processing. It features a dual-layered routing system: a modern REST API for client applications and an EJS-powered administrative dashboard for platform management.
 
 ## ✨ Key Features
 

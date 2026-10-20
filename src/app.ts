@@ -64,7 +64,7 @@ app.get("/", (req, res) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Wear It API</title>
+        <title>Wearit API</title>
         <style>
             body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; height: 100vh; margin: 0; display: flex; align-items: center; justify-content: center; background-color: #f4f7f6; }
             .card { text-align: center; padding: 2rem; background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 400px; width: 100%; }
@@ -76,7 +76,7 @@ app.get("/", (req, res) => {
     </head>
     <body>
         <div class="card">
-            <h1>Wear It API</h1>
+            <h1>Wearit API</h1>
             <p>Welcome! The API is running successfully. To manage products and users, please visit the admin dashboard.</p>
             <a href="/admin">Go to Admin Panel</a>
         </div>
