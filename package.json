@@ -1,7 +1,7 @@
 {
   "name": "wear-it",
   "version": "1.0.0",
-  "description": "This is a wear-it project's backend",
+  "description": "Backend for the Wearit e-commerce platform",
   "main": "src/server.ts",
   "scripts": {
     "start": "ts-node src/server.ts",
