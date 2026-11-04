@@ -1,16 +1,14 @@
-import { AdminRequest, MemberRequest } from '../libs/types/member';
 import { Request, Response } from 'express';
-import { T } from '../libs/types/common';
-import ProductService from '../models/Product.service';
-import { Product, ProductInput, ProductInquiry, ProductVariantUpdate } from '../libs/types/product';
-import Errors from '../libs/Errors';
-import { HttpCode } from '../libs/Errors';
-import { Message } from '../libs/Errors';
+import Errors, { HttpCode, Message } from '../libs/Errors';
 import { shapeIntoMongooseObjectId } from '../libs/config';
-import { uploadFileToSupabase } from '../libs/utils/uploader';
 import { Direction } from '../libs/enums/common.enum';
-import { ProductCategory } from '../libs/enums/product.enum';
-import { ProductGender } from '../libs/enums/product.enum';
+import { ProductCategory, ProductGender } from '../libs/enums/product.enum';
+import { T } from '../libs/types/common';
+import { AdminRequest, MemberRequest } from '../libs/types/member';
+import { Product, ProductInput, ProductInquiry, ProductVariantUpdate } from '../libs/types/product';
+import { parsePaging } from '../libs/utils/paging';
+import { uploadFileToSupabase } from '../libs/utils/uploader';
+import ProductService from '../models/Product.service';
 
 const productController: T = {},
 	productService = new ProductService();
@@ -22,8 +20,7 @@ productController.getProducts = async (req: Request, res: Response) => {
 
 		const { page, limit, direction, productCategory, productGender, isFeatured, onSale, search } = req.query;
 		const inquiry: ProductInquiry = {
-			page: Number(page),
-			limit: Number(limit),
+			...parsePaging(page, limit),
 			direction: direction as unknown as Direction,
 		};
 		if (productCategory) inquiry.productCategory = productCategory as ProductCategory;

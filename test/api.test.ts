@@ -403,6 +403,30 @@ describe('product search text', () => {
 	});
 });
 
+describe('paging', () => {
+	it('answers 200 with defaults for a missing, zero, negative or silly page and limit', async () => {
+		for (const q of [
+			'',
+			'limit=1',
+			'page=1',
+			'page=abc&limit=2',
+			'page=0&limit=2',
+			'page=1&limit=-5',
+			'page=2&limit=1.5',
+		]) {
+			const res = await request(ctx.app).get(`/product/all?${q}`);
+			assert.equal(res.status, 200, `?${q} answered ${res.status}`);
+			assert.ok(Array.isArray(res.body.list));
+		}
+	});
+
+	it('caps the page size', async () => {
+		const res = await request(ctx.app).get('/product/all?page=1&limit=99999');
+		assert.equal(res.status, 200);
+		assert.ok(res.body.list.length <= 100);
+	});
+});
+
 describe('unknown addresses', () => {
 	it('answer 404 with the JSON error body, not an HTML page', async () => {
 		const res = await request(ctx.app).get('/no/such/route');

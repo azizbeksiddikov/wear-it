@@ -1,10 +1,11 @@
-import { T } from '../libs/types/common';
 import { Response } from 'express';
-import { VerifiedMemberRequest } from '../libs/types/member';
-import Errors, { HttpCode } from '../libs/Errors';
-import OrderService from '../models/Order.service';
-import { Order, OrderInquiry, OrderUpdateInput } from '../libs/types/order';
 import { OrderStatus } from '../libs/enums/order.enum';
+import Errors, { HttpCode } from '../libs/Errors';
+import { T } from '../libs/types/common';
+import { VerifiedMemberRequest } from '../libs/types/member';
+import { Order, OrderInquiry, OrderUpdateInput } from '../libs/types/order';
+import { parsePaging } from '../libs/utils/paging';
+import OrderService from '../models/Order.service';
 
 const orderController: T = {},
 	orderService = new OrderService();
@@ -30,8 +31,7 @@ orderController.getMyOrders = async (req: VerifiedMemberRequest, res: Response) 
 
 		const { page, limit, orderStatus } = req.query,
 			inquiry: OrderInquiry = {
-				page: Number(page),
-				limit: Number(limit),
+				...parsePaging(page, limit),
 			};
 		if (orderStatus) inquiry.orderStatus = orderStatus as OrderStatus;
 
