@@ -22,7 +22,7 @@ npm run build
 npm test
 ```
 
-All three must pass. CI runs the same commands.
+All three must pass. CI runs the same commands. `npm test` starts an in-memory MongoDB, so the first run downloads a MongoDB binary (about 140 MB, cached afterwards in `node_modules/.cache`) and needs a network connection.
 
 ## Code style
 

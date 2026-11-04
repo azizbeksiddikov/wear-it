@@ -15,6 +15,11 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      # The API tests start an in-memory MongoDB; keep its binary so it is downloaded only once.
+      - uses: actions/cache@v4
+        with:
+          path: node_modules/.cache/mongodb-memory-server
+          key: mongod-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       - run: npm run lint
       - run: npm run build
       - run: npm test

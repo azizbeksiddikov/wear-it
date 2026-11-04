@@ -73,13 +73,13 @@ The full route list is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#rest-api-s
 
 ## Scripts
 
-| Command | What it does |
-|---|---|
-| `npm run dev` | run with nodemon and ts-node |
-| `npm run build` | compile to `dist/` |
-| `npm run start:prod` | run the compiled app |
-| `npm test` | Node test runner over `test/*.test.ts` |
-| `npm run lint` | ESLint |
+| Command              | What it does                                                                                                                |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`        | run with nodemon and ts-node                                                                                                |
+| `npm run build`      | compile to `dist/`                                                                                                          |
+| `npm run start:prod` | run the compiled app                                                                                                        |
+| `npm test`           | unit and API tests (`test/*.test.ts`) against an in-memory MongoDB; the first run downloads a MongoDB binary (about 140 MB) |
+| `npm run lint`       | ESLint                                                                                                                      |
 
 ## Project layout
 
