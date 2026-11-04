@@ -32,7 +32,8 @@ docker run -d \
   --env-file .env \
   -v $(pwd)/.env:/app/.env \
   -e NODE_ENV=production \
-  -p ${PORT:-3003}:3003 \
+  -e PORT=4011 \
+  -p 127.0.0.1:4011:4011 \
   --restart unless-stopped \
   wear-it-backend:prod
 

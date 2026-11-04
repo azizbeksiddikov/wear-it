@@ -35,10 +35,11 @@ COPY src/public ./dist/public
 # Copy health check script
 COPY healthcheck.js ./healthcheck.js
 
-# Expose port (default 3003, can be overridden via env)
-EXPOSE 3003
+# Port: container port = host port. Prod 4011, dev 4111, local 4211 (set PORT at run time).
+ENV PORT=4011
+EXPOSE 4011
 
-# Health check (uses PORT env var or defaults to 3003)
+# Health check (uses the PORT env var)
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
   CMD ["node", "healthcheck.js"]
 

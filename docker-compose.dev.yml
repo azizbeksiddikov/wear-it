@@ -5,7 +5,9 @@ services:
       dockerfile: Dockerfile
     container_name: wear-it-backend-dev
     ports:
-      - "${PORT:-3003}:3003"
+      - "127.0.0.1:4111:4111"
+    environment:
+      - PORT=4111
     env_file:
       - .env.dev
     restart: unless-stopped

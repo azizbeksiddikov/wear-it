@@ -20,9 +20,3 @@ Status of the backend. The storefront has its own file in [wear-it-react](https:
 - CORS allows every origin with credentials.
 - The admin dashboard is low priority and has not had the same cleanup.
 - `docker-compose.yml` exists, but the deploy scripts use `docker run`.
-
-## Ideas
-
-- API tests with an in-memory MongoDB.
-- OpenAPI description of the REST API.
-- Move the token to an httpOnly cookie (needs a storefront change too).

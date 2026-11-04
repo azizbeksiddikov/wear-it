@@ -27,7 +27,8 @@ docker run -d \
   --env-file .env.dev \
   -v $(pwd)/.env.dev:/app/.env \
   -e NODE_ENV=development \
-  -p ${PORT:-3003}:3003 \
+  -e PORT=4111 \
+  -p 127.0.0.1:4111:4111 \
   --restart unless-stopped \
   wear-it-backend:dev
 

@@ -11,6 +11,14 @@ One Express 5 app (`src/server.ts` → `src/app.ts`) that serves a REST API for 
 
 Layers: **router → controller (`src/controllers`) → service (`src/models/*.service.ts`) → Mongoose schema (`src/schema`)**. Types and enums are in `src/libs`.
 
+Ports (container port = host port, set per environment through `PORT` in the deploy scripts and compose files):
+
+|     | Prod | Dev  | Local |
+| --- | ---- | ---- | ----- |
+| api | 4011 | 4111 | 4211  |
+
+The storefront uses 4010, 4110 and 4210 (see the `wear-it-react` repository).
+
 ## REST API (`src/router.ts`)
 
 | Area    | Routes                                                                                              | Auth                                           |
@@ -22,7 +30,7 @@ Layers: **router → controller (`src/controllers`) → service (`src/models/*.s
 | Review  | `POST /review/create`, `POST /review/update`, `POST /review/delete`                                 | required                                       |
 | Health  | `GET /health` → `{ "status": "healthy" }`                                                           | none                                           |
 
-## Data model (MongoDB database `WearIt`)
+## Data model (MongoDB)
 
 - **Member**: type (`USER`, `ADMIN`), status (`ACTIVE`, `BLOCKED`, `DELETED`), unique email and phone, hashed password (bcrypt, not selected by default), name, address, image, `memberPoints` (new members start with 100).
 - **Product** and **ProductVariant**: name, category, gender, description, images, views, reviews count and rating; variants carry size, colour, price, optional sale price and stock quantity.

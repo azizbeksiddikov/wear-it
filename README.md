@@ -35,13 +35,13 @@ cd wear-it
 npm install
 
 cp .env.example .env     # then fill in the values, see docs/KEYS.md
-npm run dev              # http://localhost:3003
+npm run dev              # http://localhost:4211
 ```
 
 Check it is up:
 
 ```bash
-curl http://localhost:3003/health
+curl http://localhost:4211/health
 # {"status":"healthy"}
 ```
 
@@ -49,20 +49,20 @@ curl http://localhost:3003/health
 
 ```bash
 docker build -t wearit-api .
-docker run -d --name wearit-api -p 3003:3003 --env-file .env wearit-api
+docker run -d --name wearit-api -e PORT=4011 -p 127.0.0.1:4011:4011 --env-file .env wearit-api
 ```
 
-`PORT` in your env file must be `3003`, because the image exposes 3003. More in [docs/DEPLOY.md](docs/DEPLOY.md).
+The container port always equals the host port (prod 4011, dev 4111, local 4211), set with `PORT`. More in [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## Try the API
 
 ```bash
-curl -X POST http://localhost:3003/member/signup \
+curl -X POST http://localhost:4211/member/signup \
   -H "Content-Type: application/json" \
   -d '{"memberEmail":"me@example.com","memberPhone":"+10000000000","memberPassword":"secret123","memberFullName":"Me"}'
 
 # direction: 1 = ascending, -1 = descending
-curl "http://localhost:3003/product/all?page=1&limit=8&direction=-1"
+curl "http://localhost:4211/product/all?page=1&limit=8&direction=-1"
 ```
 
 The full route list is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#rest-api-srcrouterts). Errors always look like this:
@@ -94,7 +94,6 @@ src/
   libs/                 errors, config, enums, types, uploader
   views/, public/       admin pages and static files
 test/                   tests
-scripts/ops/            one-off operational scripts
 docs/                   architecture, deploy, keys, operations
 ```
 

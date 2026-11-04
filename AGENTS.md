@@ -21,7 +21,7 @@ Node 24, Express 5, TypeScript, Mongoose 9 (MongoDB), EJS views for the admin, S
 - `src/router.ts` (REST API), `src/router-admin.ts` (admin pages).
 - `src/controllers/` request handlers, `src/models/` services (business logic), `src/schema/` Mongoose schemas.
 - `src/libs/`: `Errors.ts`, `config.ts`, `enums/`, `types/`, `utils/` (`uploader.ts`, `supabase.ts`).
-- `test/`: node-runner tests. `scripts/ops/`: one-off operational scripts.
+- `test/`: node-runner tests. `api.test.ts` calls the real app against an in-memory MongoDB (`test/helpers/testApp.ts`); the first run downloads a MongoDB binary.
 - Details: `docs/ARCHITECTURE.md`.
 
 ## Conventions
