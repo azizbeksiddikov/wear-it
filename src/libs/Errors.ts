@@ -1,12 +1,11 @@
 export enum HttpCode {
-  OK = 200,
-  CREATED = 201,
-  NOT_MODIFIED = 304,
-  BAD_REQUEST = 400,
-  UNAUTHORIZED = 401,
-  FORBIDDEN = 403,
-  NOT_FOUND = 404,
-  INTERNAL_SERVER_ERROR = 500,
+	OK = 200,
+	CREATED = 201,
+	BAD_REQUEST = 400,
+	UNAUTHORIZED = 401,
+	FORBIDDEN = 403,
+	NOT_FOUND = 404,
+	INTERNAL_SERVER_ERROR = 500,
 }
 
 /**
@@ -16,23 +15,27 @@ export enum HttpCode {
  * without changing the client, rewording the value is safe.
  */
 export enum Message {
-  SOMETHING_WENT_WRONG = "Something went wrong. Please try again.",
-  NO_DATA_FOUND = "We couldn't find what you were looking for.",
-  CREATE_FAILED = "We couldn't create that. Please try again.",
-  UPDATE_FAILED = "We couldn't save your changes. Please try again.",
-  DELETE_FAILED = "We couldn't delete that. Please try again.",
+	SOMETHING_WENT_WRONG = 'Something went wrong. Please try again.',
+	NO_DATA_FOUND = "We couldn't find what you were looking for.",
+	CREATE_FAILED = "We couldn't create that. Please try again.",
+	UPDATE_FAILED = "We couldn't save your changes. Please try again.",
+	DELETE_FAILED = "We couldn't delete that. Please try again.",
 
-  NO_MEMBER_EMAIL = "We couldn't find an account with that email.",
-  USED_EMAIL_PHONE = "That email or phone number is already in use.",
-  BLOCKED_USER = "Your account has been blocked. Please contact Wearit support.",
-  WRONG_PASSWORD = "Wrong password. Please try again.",
-  NOT_AUTHENTICATED = "Please log in to continue.",
-  TOKEN_CREATION_FAILED = "We couldn't log you in. Please try again.",
-  FILE_UPLOAD_FAILED = "We couldn't upload the file. Please try again.",
-  RATING_OUT_OF_RANGE = "Rating must be between 0 and 5.",
-  EXISTING_USER = "An account with these details already exists.",
-  NOT_ENOUGH_POINTS = "You don't have enough points for this order.",
-  NO_ADDRESS = "Please add your delivery address first.",
+	NO_MEMBER_EMAIL = "We couldn't find an account with that email.",
+	USED_EMAIL_PHONE = 'That email or phone number is already in use.',
+	BLOCKED_USER = 'Your account has been blocked. Please contact Wearit support.',
+	WRONG_PASSWORD = 'Wrong password. Please try again.',
+	NOT_AUTHENTICATED = 'Please log in to continue.',
+	TOKEN_CREATION_FAILED = "We couldn't log you in. Please try again.",
+	FILE_UPLOAD_FAILED = "We couldn't upload the file. Please try again.",
+	RATING_OUT_OF_RANGE = 'Rating must be between 0 and 5.',
+	EXISTING_USER = 'An account with these details already exists.',
+	NOT_ENOUGH_POINTS = "You don't have enough points for this order.",
+	NO_ADDRESS = 'Please add your delivery address first.',
+	TOPUP_INVALID_AMOUNT = 'Please enter a whole number of points between 1 and 1000.',
+	TOPUP_LIMIT_REACHED = 'Your balance can hold at most 10000 points.',
+	INVALID_ORDER = "We couldn't process that order. Please refresh and try again.",
+	OUT_OF_STOCK = 'Sorry, one of the items is out of stock.',
 }
 
 /** Stable machine-readable code: the `Message` enum key, e.g. "WRONG_PASSWORD". */
@@ -42,27 +45,27 @@ export const ERROR_CODES = Object.keys(Message) as ErrorCode[];
 
 /** Look up the code for a message (the keys and values are one-to-one). */
 export const errorCodeOf = (message: Message): ErrorCode => {
-  const found = ERROR_CODES.find((key) => Message[key] === message);
-  return found ?? "SOMETHING_WENT_WRONG";
+	const found = ERROR_CODES.find((key) => Message[key] === message);
+	return found ?? 'SOMETHING_WENT_WRONG';
 };
 
 class Errors extends Error {
-  public code: HttpCode;
-  public message: Message;
-  public errorCode: ErrorCode;
+	public code: HttpCode;
+	public message: Message;
+	public errorCode: ErrorCode;
 
-  static standard = {
-    code: HttpCode.INTERNAL_SERVER_ERROR,
-    message: Message.SOMETHING_WENT_WRONG,
-    errorCode: "SOMETHING_WENT_WRONG" as ErrorCode,
-  };
+	static standard = {
+		code: HttpCode.INTERNAL_SERVER_ERROR,
+		message: Message.SOMETHING_WENT_WRONG,
+		errorCode: 'SOMETHING_WENT_WRONG' as ErrorCode,
+	};
 
-  constructor(statusCode: HttpCode, statusMessage: Message) {
-    super();
-    this.code = statusCode;
-    this.message = statusMessage;
-    this.errorCode = errorCodeOf(statusMessage);
-  }
+	constructor(statusCode: HttpCode, statusMessage: Message) {
+		super();
+		this.code = statusCode;
+		this.message = statusMessage;
+		this.errorCode = errorCodeOf(statusMessage);
+	}
 }
 
 export default Errors;

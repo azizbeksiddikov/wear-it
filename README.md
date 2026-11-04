@@ -99,15 +99,15 @@ docs/                   architecture, deploy, keys, operations
 
 ## Documentation
 
-| | |
-|---|---|
+|                                              |                                               |
+| -------------------------------------------- | --------------------------------------------- |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | layers, routes, data model, auth, error codes |
-| [docs/KEYS.md](docs/KEYS.md) | environment variables (names and meaning) |
-| [docs/DEPLOY.md](docs/DEPLOY.md) | Docker image, ports, running in production |
-| [docs/OPERATIONS.md](docs/OPERATIONS.md) | health check, logs, backups, troubleshooting |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | how to contribute |
-| [SECURITY.md](SECURITY.md) | reporting a vulnerability |
-| [PROGRESS.md](PROGRESS.md) | status, known gaps, roadmap |
+| [docs/KEYS.md](docs/KEYS.md)                 | environment variables (names and meaning)     |
+| [docs/DEPLOY.md](docs/DEPLOY.md)             | Docker image, ports, running in production    |
+| [docs/OPERATIONS.md](docs/OPERATIONS.md)     | health check, logs, troubleshooting           |
+| [SECURITY.md](SECURITY.md)                   | reporting a vulnerability                     |
+| [CONTRIBUTING.md](CONTRIBUTING.md)           | how to contribute                             |
+| [PROGRESS.md](PROGRESS.md)                   | status, known gaps, roadmap                   |
 
 ## Related
 

@@ -13,7 +13,7 @@ Rules for any AI agent in this repo.
 
 ## Stack
 
-Node 24, Express 5, TypeScript, Mongoose 9 (MongoDB), EJS views for the admin, Supabase Storage for images, JWT cookie plus `express-session` for auth. Two-space indentation.
+Node 24, Express 5, TypeScript, Mongoose 9 (MongoDB), EJS views for the admin, Supabase Storage for images, JWT cookie plus `express-session` for auth. Formatting is Prettier (`.prettierrc`: tabs, 120 columns, single quotes, trailing commas), same as the other projects.
 
 ## Layout
 
@@ -34,9 +34,10 @@ Node 24, Express 5, TypeScript, Mongoose 9 (MongoDB), EJS views for the admin, S
 
 ## Before finishing
 
-1. `npm run build`, `npm run lint` and `npm test` pass.
-2. Update `PROGRESS.md` (and the relevant file in `docs/` if behavior changed).
-3. Report briefly: what changed, what was verified, what needs the maintainer.
+1. Run `npm run format:files -- <changed files>`. It does what the editor does on save: organizes imports (sort, remove unused), then Prettier (`.prettierrc`: tabs, 120 columns, single quotes, trailing commas). Without it the editor rewrites your files the next time the maintainer saves them.
+2. `npm run build`, `npm run lint` and `npm test` pass.
+3. Update `PROGRESS.md` (and the relevant file in `docs/` if behavior changed).
+4. Report briefly: what changed, what was verified, what needs the maintainer.
 
 ## Docs map
 

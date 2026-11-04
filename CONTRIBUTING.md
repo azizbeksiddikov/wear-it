@@ -16,6 +16,7 @@ Follow the quick start in the [README](README.md). You need Node.js 24, MongoDB 
 ## Before you open a pull request
 
 ```bash
+npm run format:files -- <changed files>   # organize imports + Prettier
 npm run lint
 npm run build
 npm test
@@ -25,7 +26,7 @@ All three must pass. CI runs the same commands.
 
 ## Code style
 
-- TypeScript, two-space indentation.
+- TypeScript, formatted with Prettier (`.prettierrc`). Run `npm run format:files -- <files>` before committing.
 - Flow is router → controller → service → schema. Keep business logic in `src/models/*.service.ts`.
 - User-facing errors: `throw new Errors(HttpCode.X, Message.Y)`. Add a new `Message` member for a new error. The key is the stable `errorCode` clients rely on, so never rename a key. Keep message text free of double quotes (the admin pages embed it in `alert("...")`).
 - Add or update a test when you change behaviour.

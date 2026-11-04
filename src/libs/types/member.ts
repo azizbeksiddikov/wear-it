@@ -1,70 +1,70 @@
-import { Types } from "mongoose";
-import { MemberStatus, MemberType } from "../enums/member.enum";
-import { Session } from "express-session";
-import { Request } from "express";
+import { Types } from 'mongoose';
+import { MemberStatus, MemberType } from '../enums/member.enum';
+import { Session } from 'express-session';
+import { Request } from 'express';
 
 export interface Member {
-  _id: Types.ObjectId;
-  memberType: MemberType;
-  memberStatus: MemberStatus;
-  memberEmail: string;
-  memberPhone: string;
-  memberPassword?: string;
-  memberFullName?: string;
-  memberAddress?: string;
-  memberDesc?: string;
-  memberImage?: string;
-  memberPoints: number;
-  createdAt: Date;
-  updatedAt: Date;
+	_id: Types.ObjectId;
+	memberType: MemberType;
+	memberStatus: MemberStatus;
+	memberEmail: string;
+	memberPhone: string;
+	memberPassword?: string;
+	memberFullName?: string;
+	memberAddress?: string;
+	memberDesc?: string;
+	memberImage?: string;
+	memberPoints: number;
+	createdAt: Date;
+	updatedAt: Date;
 }
 
 export interface MemberInput {
-  memberType?: MemberType;
-  memberStatus?: MemberStatus;
-  memberPhone: string;
-  memberPassword: string;
-  memberEmail: string;
-  memberFullName?: string;
-  memberAddress?: string;
-  memberDesc?: string;
-  memberImage?: string;
-  memberPoints?: number;
+	memberType?: MemberType;
+	memberStatus?: MemberStatus;
+	memberPhone: string;
+	memberPassword: string;
+	memberEmail: string;
+	memberFullName?: string;
+	memberAddress?: string;
+	memberDesc?: string;
+	memberImage?: string;
+	memberPoints?: number;
 }
 
 export interface MemberUpdateInput {
-  _id?: Types.ObjectId; // required for admin
-  memberPhone?: string;
-  memberPassword?: string;
-  memberEmail?: string;
-  memberFullName?: string;
-  memberAddress?: string;
-  memberDesc?: string;
-  memberImage?: string;
-  memberPoints?: number;
-  memeberStatus?: MemberStatus;
+	_id?: Types.ObjectId; // required for admin
+	memberPhone?: string;
+	memberPassword?: string;
+	memberEmail?: string;
+	memberFullName?: string;
+	memberAddress?: string;
+	memberDesc?: string;
+	memberImage?: string;
+	memberPoints?: number;
+	memeberStatus?: MemberStatus;
 }
 
 export interface LoginInput {
-  memberEmail: string;
-  memberPassword: string;
+	memberEmail: string;
+	memberPassword: string;
 }
 
 export interface MemberInquiry {
-  text?: string;
+	text?: string;
 }
 
 export interface AdminRequest extends Request {
-  member: Member;
-  session: Session & { member: Member };
-  file: Express.Multer.File;
-  files: Express.Multer.File[];
+	member: Member;
+	session: Session & { member: Member };
+	file: Express.Multer.File;
+	files: Express.Multer.File[];
 }
 
 export interface MemberRequest extends Request {
-  member: Member | null;
+	member: Member | null;
 }
 
 export interface VerifiedMemberRequest extends Request {
-  member: Member;
+	member: Member;
 }

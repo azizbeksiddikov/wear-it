@@ -1,24 +1,25 @@
-import express from "express";
-import path from "path";
-import routerAdmin from "./router-admin";
-import morgan from "morgan";
-import { MORGAN_FORMAT } from "./libs/config";
-import router from "./router";
-import session from "express-session";
-import ConnectMongoDB from "connect-mongodb-session";
-import { T } from "./libs/types/common";
-import cookieParser from "cookie-parser";
-import cors from "cors";
+import ConnectMongoDB from 'connect-mongodb-session';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import express from 'express';
+import session from 'express-session';
+import morgan from 'morgan';
+import path from 'path';
+import { MORGAN_FORMAT } from './libs/config';
+import Errors, { HttpCode, Message } from './libs/Errors';
+import { T } from './libs/types/common';
+import router from './router';
+import routerAdmin from './router-admin';
 
 const MongoDBStore = ConnectMongoDB(session);
 const store = new MongoDBStore({
-  uri: process.env.MONGO_URL as string,
-  collection: "sessions",
+	uri: process.env.MONGO_URL as string,
+	collection: 'sessions',
 });
 
 /** 1-ENTRANCE **/
 const app = express();
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, 'public')));
 // app.use("/uploads", express.static("./uploads"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -30,41 +31,41 @@ app.use(morgan(MORGAN_FORMAT));
 
 /** 2-SESSIONS **/
 // Set COOKIE_SECURE=true in .env for HTTPS production
-const secureCookie = process.env.COOKIE_SECURE === "true";
+const secureCookie = process.env.COOKIE_SECURE === 'true';
 
 app.use(
-  session({
-    secret: process.env.SESSION_SECRET as string,
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 24, // 1 day
-      secure: secureCookie,
-      // sameSite: "lax",
-      // httpOnly: true,
-    },
-    store: store,
-    resave: false,
-    saveUninitialized: false,
-  })
+	session({
+		secret: process.env.SESSION_SECRET as string,
+		cookie: {
+			maxAge: 1000 * 60 * 60 * 24, // 1 day
+			secure: secureCookie,
+			// sameSite: "lax",
+			// httpOnly: true,
+		},
+		store: store,
+		resave: false,
+		saveUninitialized: false,
+	}),
 );
 
 app.use(function (req, res, next) {
-  const sessionInstance = req.session as T;
-  res.locals.member = sessionInstance.member;
-  next();
+	const sessionInstance = req.session as T;
+	res.locals.member = sessionInstance.member;
+	next();
 });
 
 /** 3-VIEWS **/
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "ejs");
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
 /** 4-HEALTH CHECK **/
-app.get("/health", (req, res) => {
-  res.status(200).json({ status: "healthy" });
+app.get('/health', (req, res) => {
+	res.status(200).json({ status: 'healthy' });
 });
 
 /** 4-ROUTERS **/
-app.get("/", (req, res) => {
-  res.send(`
+app.get('/', (req, res) => {
+	res.send(`
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -90,7 +91,15 @@ app.get("/", (req, res) => {
     </html>
   `);
 });
-app.use("/admin", routerAdmin);
-app.use("/", router);
+app.use('/admin', routerAdmin);
+app.use('/', router);
 
+// Anything the routers did not answer: the same JSON error body as every other API error (the admin keeps Express's page).
+app.use((req, res, next) => {
+	if (req.path.startsWith('/admin')) return next();
+	res.status(HttpCode.NOT_FOUND).json(new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND));
+});
+
+// The session store is exported only so tests can close its connection.
+export { store as sessionStore };
 export default app;

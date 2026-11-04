@@ -1,4 +1,4 @@
 export enum Direction {
-  ASC = 1,
-  DESC = -1,
+	ASC = 1,
+	DESC = -1,
 }

@@ -1,8 +1,8 @@
-import multer from "multer";
-import { v4 } from "uuid";
-import { supabase } from "./supabase";
-import { decode } from "base64-arraybuffer";
-import Errors, { HttpCode, Message } from "../Errors";
+import multer from 'multer';
+import { v4 } from 'uuid';
+import { supabase } from './supabase';
+import { decode } from 'base64-arraybuffer';
+import Errors, { HttpCode, Message } from '../Errors';
 // import path from "path";
 // import fs from "fs";
 
@@ -32,76 +32,59 @@ import Errors, { HttpCode, Message } from "../Errors";
 // export default makeUploader;
 
 export const memoryUploader = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 },
+	storage: multer.memoryStorage(),
+	limits: { fileSize: 10 * 1024 * 1024 },
 });
 
-export const uploadFileToSupabase = async (
-  file: Express.Multer.File,
-  folderName: string = "products"
-) => {
-  const fileExtension = file.originalname.split(".").pop();
+export const uploadFileToSupabase = async (file: Express.Multer.File, folderName: string = 'products') => {
+	const fileExtension = file.originalname.split('.').pop();
 
-  const randomFileName = `${v4()}.${fileExtension}`; // Generate a random name
+	const randomFileName = `${v4()}.${fileExtension}`; // Generate a random name
 
-  const fileBase64 = decode(file.buffer.toString("base64"));
+	const fileBase64 = decode(file.buffer.toString('base64'));
 
-  const { data, error } = await supabase.storage
-    .from(folderName)
-    .upload(`/${randomFileName}`, fileBase64, {
-      contentType: file.mimetype,
-    });
+	const { data, error } = await supabase.storage.from(folderName).upload(`/${randomFileName}`, fileBase64, {
+		contentType: file.mimetype,
+	});
 
-  if (error) {
-    console.error("Error uploading file to Supabase:", error);
-    throw new Errors(
-      HttpCode.INTERNAL_SERVER_ERROR,
-      Message.FILE_UPLOAD_FAILED
-    );
-  }
+	if (error) {
+		console.error('Error uploading file to Supabase:', error);
+		throw new Errors(HttpCode.INTERNAL_SERVER_ERROR, Message.FILE_UPLOAD_FAILED);
+	}
 
-  const { data: image } = supabase.storage
-    .from(folderName)
-    .getPublicUrl(data.path);
+	const { data: image } = supabase.storage.from(folderName).getPublicUrl(data.path);
 
-  return image.publicUrl;
+	return image.publicUrl;
 };
 
-export const deleteFileFromSupabase = async (
-  fileUrl: string,
-  folderName: string = "products"
-): Promise<boolean> => {
-  try {
-    // Extract filename from URL
-    const urlParts = fileUrl.split("/");
-    const fileName = urlParts[urlParts.length - 1];
+export const deleteFileFromSupabase = async (fileUrl: string, folderName: string = 'products'): Promise<boolean> => {
+	try {
+		// Extract filename from URL
+		const urlParts = fileUrl.split('/');
+		const fileName = urlParts[urlParts.length - 1];
 
-    const { error } = await supabase.storage
-      .from(folderName)
-      .remove([`/${fileName}`]);
+		const { error } = await supabase.storage.from(folderName).remove([`/${fileName}`]);
 
-    if (error) {
-      console.error("Error deleting file from Supabase:", error);
-      return false;
-    }
+		if (error) {
+			console.error('Error deleting file from Supabase:', error);
+			return false;
+		}
 
-    console.log(`Successfully deleted file: ${fileName}`);
-    return true;
-  } catch (err) {
-    console.error("Failed to delete file from Supabase:", err);
-    return false;
-  }
+		console.log(`Successfully deleted file: ${fileName}`);
+		return true;
+	} catch (err) {
+		console.error('Failed to delete file from Supabase:', err);
+		return false;
+	}
 };
 
-export const deleteFilesFromSupabase = async (
-  fileUrls: string[]
-): Promise<void> => {
-  if (!fileUrls || fileUrls.length === 0) return;
+export const deleteFilesFromSupabase = async (fileUrls: string[]): Promise<void> => {
+	if (!fileUrls || fileUrls.length === 0) return;
 
-  try {
-    // Process deletions in parallel
-    await Promise.all(fileUrls.map((url) => deleteFileFromSupabase(url)));
-  } catch (err) {
-    console.error("Error during bulk file deletion:", err);
-  }
+	try {
+		// Process deletions in parallel
+		await Promise.all(fileUrls.map((url) => deleteFileFromSupabase(url)));
+	} catch (err) {
+		console.error('Error during bulk file deletion:', err);
+	}
 };
